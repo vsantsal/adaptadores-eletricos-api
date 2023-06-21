@@ -14,7 +14,9 @@ Considerando a descrição básica do conjunto de APIs, consideraremos que, para
 
 Implementaremos inicialmente apenas as APIs de cadastro das entidades do domínio do problema.
 
-Utilizaremos uma abordagem TDD, criando os testes de integração para os controllers antes de efetivamente criar o código deles.
+Criaremos testes de integração para os controllers para confirmar os principais comportamentos.
+
+Configuraremos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*). 
 
 A primeira API a ser construida será a de cadastro de endereços.
 
