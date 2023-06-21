@@ -16,7 +16,7 @@ Implementaremos inicialmente apenas as APIs de cadastro das entidades do domíni
 
 Utilizaremos uma abordagem TDD, criando os testes de integração para os controllers antes de efetivamente criar o código deles.
 
-A primeira API a ser construida sera a de cadastro de endereços.
+A primeira API a ser construida será a de cadastro de endereços.
 
 ### API de Cadastro de Endereços
 
@@ -24,7 +24,7 @@ Nossa API Rest deve suportar a inclusão no cadastro de endereços, sobre os qua
 
 O enpdpoint para o cadastro será `/enderecos`, através do método HTTP POST.
 
-O **body** de cada requisição deve informar JSON no seguinte formato:
+O *body* de cada requisição deve informar JSON no seguinte formato:
 
 ```json 
 {
@@ -36,6 +36,6 @@ O **body** de cada requisição deve informar JSON no seguinte formato:
 }
 ```
 
-Em caso de sucesso, a aplicação deve informar a **location** do recurso criado.
+Em caso de sucesso, a aplicação deve informar a *location* do recurso criado.
 
 Se falha nos dados passados pelos clientes, deve informar o erro.
