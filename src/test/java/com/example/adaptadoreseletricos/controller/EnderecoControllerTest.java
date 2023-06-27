@@ -52,8 +52,8 @@ class EnderecoControllerTest {
                         .content(
                                 "{\"rua\": \"Rua Nascimento Silva\", " +
                                         "\"numero\": 107, " +
-                                        "\"bairro\": \"Ipanema\"" +
-                                        "\"cidade\": \"Rio de Janeiro\"" +
+                                        "\"bairro\": \"Ipanema\", " +
+                                        "\"cidade\": \"Rio de Janeiro\", " +
                                         "\"estado\": \"RJ\"}"
                         )
         )
