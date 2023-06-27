@@ -3,6 +3,7 @@ package com.example.adaptadoreseletricos.controller;
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.Eletrodomestico;
 import com.example.adaptadoreseletricos.domain.repository.eletrodomestico.EletrodomesticoRepository;
 import com.example.adaptadoreseletricos.service.eletrodomestico.EletrodomesticoService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 
 @WebMvcTest(EletrodomesticoController.class)
@@ -130,6 +132,36 @@ class EletrodomesticoControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andExpect(header().string("Location", containsString("eletrodomesticos/1")));
+    }
+
+    @DisplayName("Teste de detalhamento de endereço para id válido na API")
+    @Test
+    public void test_deve_detalhar_eletrodomestico_para_id_valido() throws Exception {
+        // Arrange
+        when(repository.getReferenceById(1L)).thenReturn(
+                new Eletrodomestico(
+                        1L,
+                        "Aparelho de som",
+                        "XPTO",
+                        "ABC",
+                        200L
+                )
+        );
+        // Act
+        this.mockMvc.perform(get("/eletrodomesticos/1"))
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$.nome",
+                        Matchers.is("Aparelho de som")))
+                .andExpect(jsonPath("$.modelo",
+                        Matchers.is("XPTO")))
+                .andExpect(jsonPath("$.marca",
+                        Matchers.is("ABC")))
+                .andExpect(jsonPath("$.potencia",
+                        Matchers.is(200)));
+
     }
 
 }

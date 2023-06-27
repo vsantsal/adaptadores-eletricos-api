@@ -19,4 +19,9 @@ public class EletrodomesticoService {
         Eletrodomestico eletroSalvo = this.repository.save(eletroASalvar);
         return new EletrodomesticoDetalheDTO(eletroSalvo);
     }
+
+    public EletrodomesticoDetalheDTO detalhar(Long id) {
+        Eletrodomestico eletrodomestico = this.repository.getReferenceById(id);
+        return new EletrodomesticoDetalheDTO(eletrodomestico);
+    }
 }
