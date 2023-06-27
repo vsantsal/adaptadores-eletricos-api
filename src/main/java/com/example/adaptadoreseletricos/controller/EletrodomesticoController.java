@@ -1,5 +1,7 @@
 package com.example.adaptadoreseletricos.controller;
 
+import com.example.adaptadoreseletricos.dto.eletrodomestico.EletrodomesticoCadastroDTO;
+import com.example.adaptadoreseletricos.service.eletrodomestico.EletrodomesticoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +16,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class EletrodomesticoController {
 
     @Autowired
-    private EletrodomesticoService service;
+    private EletrodomesticoService eletrodomesticoService;
 
     @PostMapping
     public ResponseEntity cadastrar(
-            @RequestBody @Valid CadastroEletrodomesticoDTO dto,
+            @RequestBody @Valid EletrodomesticoCadastroDTO dto,
             UriComponentsBuilder uriComponentsBuilder
     ){
-        var dtoResposta = this.service.salvar(dto);
+        var dtoResposta = this.eletrodomesticoService.salvar(dto);
         var uri = uriComponentsBuilder.path("/eletrodomesticos/{id}").buildAndExpand(dtoResposta.id()).toUri();
         return ResponseEntity.created(uri).body(dtoResposta);
     }

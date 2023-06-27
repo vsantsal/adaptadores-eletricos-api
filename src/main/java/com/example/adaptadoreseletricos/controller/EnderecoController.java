@@ -1,6 +1,6 @@
 package com.example.adaptadoreseletricos.controller;
 
-import com.example.adaptadoreseletricos.dto.endereco.CadastroEnderecoDTO;
+import com.example.adaptadoreseletricos.dto.endereco.EnderecoCadastroDTO;
 import com.example.adaptadoreseletricos.service.endereco.EnderecoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class EnderecoController {
 
     @PostMapping
     public ResponseEntity cadastrar(
-            @RequestBody @Valid CadastroEnderecoDTO dto,
+            @RequestBody @Valid EnderecoCadastroDTO dto,
             UriComponentsBuilder uriComponentsBuilder
     ){
         var dtoResposta = this.service.salvar(dto);

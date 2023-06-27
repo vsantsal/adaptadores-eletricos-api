@@ -3,7 +3,7 @@ package com.example.adaptadoreseletricos.dto.endereco;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
 
-public record CadastroEnderecoDTO(
+public record EnderecoCadastroDTO(
         String rua,
         Long numero,
         String bairro,

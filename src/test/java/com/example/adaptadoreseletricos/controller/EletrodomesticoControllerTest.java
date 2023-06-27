@@ -1,7 +1,8 @@
 package com.example.adaptadoreseletricos.controller;
 
-import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
-import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
+import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.Eletrodomestico;
+import com.example.adaptadoreseletricos.domain.repository.eletrodomestico.EletrodomesticoRepository;
+import com.example.adaptadoreseletricos.service.eletrodomestico.EletrodomesticoService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@WebMvcTest
+@WebMvcTest(EletrodomesticoController.class)
 class EletrodomesticoControllerTest {
 
     @Autowired
@@ -37,10 +38,11 @@ class EletrodomesticoControllerTest {
         // Arrange
         when(repository.save(any(Eletrodomestico.class))).thenReturn(
                 new Eletrodomestico(
+                        1L,
                         "Aparelho de som",
                         "XPTO",
                         "ABC",
-                        200
+                        200L
                 )
         );
 
