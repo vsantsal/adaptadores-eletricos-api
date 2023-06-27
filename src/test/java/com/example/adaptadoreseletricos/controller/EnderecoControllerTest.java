@@ -4,6 +4,7 @@ import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
 import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecoRepository;
 import com.example.adaptadoreseletricos.service.endereco.EnderecoService;
+import jakarta.persistence.EntityNotFoundException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 
 import static org.hamcrest.Matchers.containsString;
@@ -140,6 +142,23 @@ class EnderecoControllerTest {
                         Matchers.is("Rio de Janeiro")))
                 .andExpect(jsonPath("$.estado",
                         Matchers.is("RJ")));
+    }
+
+    @DisplayName("Teste de detalhamento de endereco para Id inexistente na API")
+    @Test
+    public void test_nao_deve_detalhar_endereco_para_id_invalido() throws Exception {
+        // Arrange
+        when(repository.getReferenceById(2L)).thenThrow(
+                EntityNotFoundException.class
+        );
+
+        // Act
+        this.mockMvc.perform(get("/enderecos/2"))
+
+            // Assert
+            .andExpect(status().isNotFound());
+
+
     }
 
 }

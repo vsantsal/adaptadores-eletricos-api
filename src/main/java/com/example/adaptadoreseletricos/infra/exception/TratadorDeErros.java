@@ -1,5 +1,6 @@
 package com.example.adaptadoreseletricos.infra.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,5 +17,10 @@ public class TratadorDeErros {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity tratarErro409(DataIntegrityViolationException exception){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity tratarErro404(){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("id inexistente");
     }
 }
