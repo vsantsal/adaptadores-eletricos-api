@@ -16,7 +16,7 @@ public class EnderecoController {
     private EnderecoService service;
 
     @PostMapping
-    public ResponseEntity cadastrarEndereco(
+    public ResponseEntity cadastrar(
             @RequestBody @Valid CadastroEnderecoDTO dto,
             UriComponentsBuilder uriComponentsBuilder
     ){

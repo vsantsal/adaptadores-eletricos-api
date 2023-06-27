@@ -14,11 +14,11 @@ Considerando a descrição básica do conjunto de APIs, consideraremos que, para
 
 Implementaremos inicialmente apenas as APIs de cadastro das entidades do domínio do problema.
 
+Ainda não faremos a associação entre as entidades.
+
 Criaremos testes de integração para os controllers para confirmar os principais comportamentos.
 
-Configuraremos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*). 
-
-A primeira API a ser construida será a de cadastro de endereços.
+Configuraremos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*).
 
 ### API de Cadastro de Endereços
 
@@ -35,6 +35,27 @@ O *body* de cada requisição deve informar JSON no seguinte formato:
   "bairro": "Ipanema",
   "cidade": "Rio de Janeiro",
   "estado": "RJ"
+}
+```
+
+Em caso de sucesso, a aplicação deve informar a *location* do recurso criado.
+
+Se falha nos dados passados pelos clientes, deve informar o erro.
+
+### API de Cadastro de Eletrodomésticos
+
+Nossa API Rest deve suportar a inclusão no cadastro de eletrodomésticos.
+
+O enpdpoint para o cadastro será `/eletrodomesticos`, através do método HTTP POST.
+
+O *body* de cada requisição deve informar JSON no seguinte formato:
+
+```json 
+{
+  "nome": "Aparelho de som",
+  "modelo": "XPTO",
+  "marca": "ABC",
+  "potencia": 200
 }
 ```
 
