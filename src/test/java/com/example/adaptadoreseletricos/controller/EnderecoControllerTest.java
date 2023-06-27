@@ -1,8 +1,8 @@
 package com.example.adaptadoreseletricos.controller;
 
-import com.example.adaptadoreseletricos.domain.entity.Endereco;
-import com.example.adaptadoreseletricos.domain.repository.EnderecoRepository;
-import com.example.adaptadoreseletricos.service.EnderecoService;
+import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
+import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecoRepository;
+import com.example.adaptadoreseletricos.service.endereco.EnderecoService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.example.adaptadoreseletricos.domain.entity;
+package com.example.adaptadoreseletricos.domain.entity.endereco;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

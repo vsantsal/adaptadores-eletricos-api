@@ -1,6 +1,6 @@
-package com.example.adaptadoreseletricos.dto;
+package com.example.adaptadoreseletricos.dto.endereco;
 
-import com.example.adaptadoreseletricos.domain.entity.Endereco;
+import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
 
 public record EnderecoDetalheDTO(
         Long id,

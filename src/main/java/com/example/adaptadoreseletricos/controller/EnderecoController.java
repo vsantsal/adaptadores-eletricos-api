@@ -1,7 +1,7 @@
 package com.example.adaptadoreseletricos.controller;
 
-import com.example.adaptadoreseletricos.dto.CadastroEnderecoDTO;
-import com.example.adaptadoreseletricos.service.EnderecoService;
+import com.example.adaptadoreseletricos.dto.endereco.CadastroEnderecoDTO;
+import com.example.adaptadoreseletricos.service.endereco.EnderecoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
