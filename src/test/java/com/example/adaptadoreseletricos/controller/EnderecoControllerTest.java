@@ -161,4 +161,61 @@ class EnderecoControllerTest {
 
     }
 
+    @DisplayName("Teste de inclusão de endereço com rua muito comprida retorna erro")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_nome_rua_muito_comprida() throws Exception {
+        // Arrange/Act
+        this.mockMvc.perform(
+                        post("/enderecos")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"rua\": \""+ "x".repeat(121)+"\", " +
+                                                "\"numero\": 107, " +
+                                                "\"bairro\": \"Ipanema\", " +
+                                                "\"cidade\": \"Rio de Janeiro\", " +
+                                                "\"estado\": \"RJ\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().is4xxClientError());
+    }
+
+    @DisplayName("Teste de inclusão de endereço com rua com número negativo retorna erro")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_numero_negativo() throws Exception {
+        // Arrange/Act
+        this.mockMvc.perform(
+                        post("/enderecos")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"rua\": \"Rua Nascimento Silva\", " +
+                                                "\"numero\": -107, " +
+                                                "\"bairro\": \"Ipanema\", " +
+                                                "\"cidade\": \"Rio de Janeiro\", " +
+                                                "\"estado\": \"RJ\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().is4xxClientError());
+    }
+
+    @DisplayName("Teste de inclusão de endereço com sigla de estado muito comprido retorna erro")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_sigla_estado_muito_comprido() throws Exception {
+        // Arrange/Act
+        this.mockMvc.perform(
+                        post("/enderecos")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"rua\": \"Rua Nascimento Silva\", " +
+                                                "\"numero\": 107, " +
+                                                "\"bairro\": \"Ipanema\", " +
+                                                "\"cidade\": \"Rio de Janeiro\", " +
+                                                "\"estado\": \"" + "X".repeat(3) + "\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().is4xxClientError());
+    }
+
 }
