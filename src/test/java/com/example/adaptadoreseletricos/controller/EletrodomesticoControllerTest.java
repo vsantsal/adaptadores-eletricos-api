@@ -3,6 +3,7 @@ package com.example.adaptadoreseletricos.controller;
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.Eletrodomestico;
 import com.example.adaptadoreseletricos.domain.repository.eletrodomestico.EletrodomesticoRepository;
 import com.example.adaptadoreseletricos.service.eletrodomestico.EletrodomesticoService;
+import jakarta.persistence.EntityNotFoundException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -148,7 +149,7 @@ class EletrodomesticoControllerTest {
                 )
         );
         // Act
-        this.mockMvc.perform(get("/eletrodomesticos/1"))
+        this.mockMvc.perform(get(endpoint + "/1"))
                 // Assert
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id",
@@ -162,6 +163,21 @@ class EletrodomesticoControllerTest {
                 .andExpect(jsonPath("$.potencia",
                         Matchers.is(200)));
 
+    }
+
+    @DisplayName("Teste de detalhamento de eletrodoméstico para id inexistente na API")
+    @Test
+    public void test_nao_deve_detalhar_eletrodomestico_para_id_invalido() throws Exception {
+        // Arrange
+        when(repository.getReferenceById(2L)).thenThrow(
+                EntityNotFoundException.class
+        );
+
+        // Act
+        this.mockMvc.perform(get(endpoint + "/2"))
+
+                // Assert
+                .andExpect(status().isNotFound());
     }
 
 }
