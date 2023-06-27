@@ -23,6 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(EletrodomesticoController.class)
 class EletrodomesticoControllerTest {
 
+    private String endpoint = "/eletrodomesticos";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -48,12 +50,79 @@ class EletrodomesticoControllerTest {
 
         // Act
         this.mockMvc.perform(
-                        post("/eletrodomesticos")
+                        post(endpoint)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         "{\"nome\": \"Aparelho de som\", " +
                                                 "\"modelo\": \"XPTO\", " +
-                                                "\"marc\": \"ABC\", " +
+                                                "\"marca\": \"ABC\", " +
+                                                "\"potencia\": 200}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string("Location", containsString("eletrodomesticos/1")));
+    }
+
+    @DisplayName("Teste de erro ao cadastrar eletrodoméstico com potência negativa")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_potencia_negativa() throws Exception{
+        // Arrange/Act
+        this.mockMvc.perform(
+                post(endpoint)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                "{\"nome\": \"Aparelho de som\", " +
+                                        "\"modelo\": \"XPTO\", " +
+                                        "\"marca\": \"ABC\", " +
+                                        "\"potencia\": -1}"
+                        )
+                )
+                    // Assert
+                        .andExpect(status().is4xxClientError());
+    }
+
+    @DisplayName("Teste de erro ao cadastrar eletrodoméstico com nome com mais de 120 caracteres")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_nome_muito_comprido() throws Exception{
+        // Arrange/Act
+        this.mockMvc.perform(
+                        post(endpoint)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \" " + "a".repeat(121) + "\", " +
+                                                "\"modelo\": \"XPTO\", " +
+                                                "\"marca\": \"ABC\", " +
+                                                "\"potencia\": 1}"
+                                )
+                )
+                // Assert
+                .andExpect(status().is4xxClientError());
+    }
+
+    @DisplayName("Teste de cadastro de eletrodomestico se modelo possui quantidade maxima de caracteres")
+    @Test
+    public void test_deve_criar_eletrodomestico_se_quantidade_maxima_de_modelo_eh_respeitada() throws Exception {
+        // Arrange
+        when(repository.save(any(Eletrodomestico.class))).thenReturn(
+                new Eletrodomestico(
+                        1L,
+                        "b".repeat(120),
+                        "XPTO",
+                        "ABC",
+                        200L
+                )
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        post(endpoint)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"" + "b".repeat(120) + "\", " +
+                                                "\"modelo\": \"XPTO\", " +
+                                                "\"marca\": \"ABC\", " +
                                                 "\"potencia\": 200}"
                                 )
                 )
