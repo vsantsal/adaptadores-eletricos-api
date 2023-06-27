@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.sql.SQLIntegrityConstraintViolationException;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -83,5 +86,28 @@ class EnderecoControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
+    @DisplayName("Teste com erro de integridade de dados no BD")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_provoca_erro_integridade_dados() throws Exception {
+        // Arrange
+        when(repository.save(any(Endereco.class))).thenThrow(
+                DataIntegrityViolationException.class
+        );
+
+        // Act
+        this.mockMvc.perform(
+                post("/enderecos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                "{\"rua\": \"Rua Nascimento Silva\", " +
+                                        "\"numero\": 107, " +
+                                        "\"bairro\": \"Ipanema\", " +
+                                        "\"cidade\": \"Rio de Janeiro\", " +
+                                        "\"estado\": \"RJ\"}"
+                        )
+        )
+                // Assert
+                .andExpect(status().isConflict());
+    }
 
 }
