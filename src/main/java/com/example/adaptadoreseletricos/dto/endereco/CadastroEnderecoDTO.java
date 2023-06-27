@@ -1,6 +1,7 @@
 package com.example.adaptadoreseletricos.dto.endereco;
 
 import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
+import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
 
 public record CadastroEnderecoDTO(
         String rua,
@@ -15,7 +16,7 @@ public record CadastroEnderecoDTO(
         endereco.setNumero(numero());
         endereco.setBairro(bairro());
         endereco.setCidade(cidade());
-        endereco.setEstado(estado());
+        endereco.setEstado(Estado.valueOf(estado()));
         return endereco;
     }
 }

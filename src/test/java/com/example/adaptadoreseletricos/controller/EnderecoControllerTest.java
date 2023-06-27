@@ -1,6 +1,7 @@
 package com.example.adaptadoreseletricos.controller;
 
 import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
+import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
 import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecoRepository;
 import com.example.adaptadoreseletricos.service.endereco.EnderecoService;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +42,7 @@ class EnderecoControllerTest {
                         107L,
                         "Ipanema",
                         "Rio de Janeiro",
-                        "RJ"
+                        Estado.RJ
                 )
         );
 
