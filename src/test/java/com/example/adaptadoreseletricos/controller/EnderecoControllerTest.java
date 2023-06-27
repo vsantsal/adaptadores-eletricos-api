@@ -64,5 +64,24 @@ class EnderecoControllerTest {
                 .andExpect(header().string("Location", containsString("enderecos/1")));
     }
 
+    @DisplayName("Teste de inclusão de endereço com estado inválido")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_estado_invalido() throws Exception {
+        // Arrange/Act
+        this.mockMvc.perform(
+                post("/enderecos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                "{\"rua\": \"Rua Nascimento Silva\", " +
+                                        "\"numero\": 107, " +
+                                        "\"bairro\": \"Ipanema\", " +
+                                        "\"cidade\": \"Rio de Janeiro\", " +
+                                        "\"estado\": \"INEXISTENTE\"}"
+                        )
+        )
+        // Assert
+                .andExpect(status().is4xxClientError());
+    }
+
 
 }
