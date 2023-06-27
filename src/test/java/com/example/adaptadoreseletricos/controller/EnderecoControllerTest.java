@@ -4,6 +4,7 @@ import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
 import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecoRepository;
 import com.example.adaptadoreseletricos.service.endereco.EnderecoService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +15,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest
 class EnderecoControllerTest {
@@ -108,6 +107,39 @@ class EnderecoControllerTest {
         )
                 // Assert
                 .andExpect(status().isConflict());
+    }
+
+    @DisplayName("Teste de detalhamento de endereço para id válido na API")
+    @Test
+    public void test_deve_detalhar_endereco_para_id_valido() throws Exception {
+        // Arrange
+        when(repository.getReferenceById(1L)).thenReturn(
+                new Endereco(
+                        1L,
+                        "Rua Nascimento Silva",
+                        107L,
+                        "Ipanema",
+                        "Rio de Janeiro",
+                        Estado.RJ
+                )
+        );
+
+        // Act
+        this.mockMvc.perform(get("/enderecos/1"))
+            // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$.rua",
+                        Matchers.is("Rua Nascimento Silva")))
+                .andExpect(jsonPath("$.numero",
+                        Matchers.is(107)))
+                .andExpect(jsonPath("$.bairro",
+                        Matchers.is("Ipanema")))
+                .andExpect(jsonPath("$.cidade",
+                        Matchers.is("Rio de Janeiro")))
+                .andExpect(jsonPath("$.estado",
+                        Matchers.is("RJ")));
     }
 
 }

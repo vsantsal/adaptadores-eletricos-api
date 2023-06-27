@@ -20,4 +20,9 @@ public class EnderecoService {
         Endereco enderecoSalvo = this.repository.save(enderecoASalvar);
         return new EnderecoDetalheDTO(enderecoSalvo);
     }
+
+    public EnderecoDetalheDTO detalhar(Long id) {
+        Endereco endereco = repository.getReferenceById(id);
+        return new EnderecoDetalheDTO(endereco);
+    }
 }
