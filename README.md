@@ -62,3 +62,33 @@ O *body* de cada requisição deve informar JSON no seguinte formato:
 Em caso de sucesso, a aplicação deve informar a *location* do recurso criado.
 
 Se falha nos dados passados pelos clientes, deve informar o erro.
+
+### API de Cadastro de Pessoas
+
+Nossa API Rest deve suportar a inclusão no cadastro de pessoas.
+
+O enpdpoint para o cadastro será `/pessoas`, através do método HTTP POST.
+
+O *body* de cada requisição deve informar JSON no seguinte formato:
+
+```json 
+{
+  "nome": "Fulano de tal",
+  "dataNascimento": "1980-01-01",
+  "sexo": "MASCULINO",
+  "parentesco": "FILHO"
+}
+```
+
+Em caso de sucesso, a aplicação deve informar a *location* do recurso criado.
+
+Se falha nos dados passados pelos clientes, deve informar o erro.
+
+## Resumo Desenvolvimento
+
+* O SGBD utilizado é o MySQL, conforme pode ser lido pelas dependências no `pom.xml`. Para versionamento e *migrations* dos scripts de criação de tabela, utilizamos a dependência `flyway`.
+* Adotamos testes de integração sobre os *controllers* para verificar se comportamento da solução está de acordo com o esperado. Para tanto, consultamos, dentre outras, as seguintes fontes:
+  * https://rieckpil.de/guide-to-testing-with-spring-boot-starter-test/
+  * https://www.baeldung.com/spring-boot-testing
+* Nos testes, preferimos *mockar* os repositórios, haja vista não termos adicionado nenhuma inteligência a eles, apenas herdamos as implementação da interface *JpaRepository*, em vez dos *services*, que codamos e poderiam ter alguma lógica escrita erroneamente (para tanto, anotamos essas últimas dependências nas classes de testes como `SpyBean`, que, segundo a [documentação](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/mock/mockito/SpyBean.html), faz utilizar a implementação real)
+* Implementamos também métodos `GET` para os *endpoints*, haja vista a criação dos recursos pelo método *POST* em cada um desses endpoints.
