@@ -135,7 +135,7 @@ class EletrodomesticoControllerTest {
                 .andExpect(header().string("Location", containsString("eletrodomesticos/1")));
     }
 
-    @DisplayName("Teste de detalhamento de endereço para id válido na API")
+    @DisplayName("Teste de detalhamento de eletrodoméstico para id válido na API")
     @Test
     public void test_deve_detalhar_eletrodomestico_para_id_valido() throws Exception {
         // Arrange
