@@ -107,4 +107,24 @@ class PessoaControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
+    @DisplayName("Teste de cadastro de pessoa com nome acima 120 caracteres retorna erro")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_nome_pessoa_muito_comprido() throws Exception {
+        // Arrange/Act
+        this.mockMvc.perform(
+                post(ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                "{\"nome\": \"" + "Z".repeat(121) + "\", " +
+                                        "\"dataNascimento\": \"1980-01-01\", " +
+                                        "\"sexo\": \"MASCULINO\", " +
+                                        "\"parentesco\": \"FILHO\"}"
+                        )
+        )
+                // Assert
+                .andExpect(status().is4xxClientError());
+
+    }
+
+
 }
