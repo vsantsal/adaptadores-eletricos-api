@@ -95,4 +95,5 @@ Se falha nos dados passados pelos clientes, deve informar o erro.
   * https://rieckpil.de/guide-to-testing-with-spring-boot-starter-test/
   * https://www.baeldung.com/spring-boot-testing
 * Nos testes, preferimos *mockar* os repositórios, haja vista não termos adicionado nenhuma inteligência a eles, apenas herdamos as implementação da interface *JpaRepository*, em vez dos *services*, que codamos e poderiam ter alguma lógica escrita erroneamente (para tanto, anotamos essas últimas dependências nas classes de testes como `SpyBean`, que, segundo a [documentação](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/mock/mockito/SpyBean.html), faz utilizar a implementação real)
+* Configuramos *workflow* de execução de testes automáticos quando houver integração aos ramos principais (`develop`e `main`) por meio do *Github Actions*
 * Implementamos também métodos `GET` para os *endpoints*, haja vista a criação dos recursos pelo método *POST* em cada um desses endpoints.
