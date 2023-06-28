@@ -20,4 +20,9 @@ public class PessoaService {
         Pessoa pessoaSalva = this.repository.save(pessoaASalvar);
         return new PessoaDetalheDTO(pessoaSalva);
     }
+
+    public PessoaDetalheDTO detalhar(Long id) {
+        Pessoa pessoa = repository.getReferenceById(id);
+        return new PessoaDetalheDTO(pessoa);
+    }
 }
