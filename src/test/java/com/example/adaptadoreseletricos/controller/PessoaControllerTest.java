@@ -69,4 +69,42 @@ class PessoaControllerTest {
                 .andExpect(header().string("Location", containsString(ENDPOINT + "/1")));
     }
 
+    @DisplayName("Teste de cadastro de pessoa com sexo inválido")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_sexo_invalido() throws Exception {
+        // Arrange/Act
+        this.mockMvc.perform(
+                post(ENDPOINT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                "{\"nome\": \"Fulano de Tal\", " +
+                                        "\"dataNascimento\": \"1980-01-01\", " +
+                                        "\"sexo\": \"INEXISTENTE\", " +
+                                        "\"parentesco\": \"FILHO\"}"
+                        )
+        )
+
+        // Assert
+                .andExpect(status().is4xxClientError());
+    }
+
+    @DisplayName("Teste de cadastro de pessoa com parentesco inválido")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_parentesco_invalido() throws Exception {
+        // Arrange/Act
+        this.mockMvc.perform(
+                        post(ENDPOINT)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"Fulano de Tal\", " +
+                                                "\"dataNascimento\": \"1980-01-01\", " +
+                                                "\"sexo\": \"MASCULINO\", " +
+                                                "\"parentesco\": \"INEXISTENTE\"}"
+                                )
+                )
+
+                // Assert
+                .andExpect(status().is4xxClientError());
+    }
+
 }
