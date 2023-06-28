@@ -1,5 +1,10 @@
 package com.example.adaptadoreseletricos.controller;
 
+import com.example.adaptadoreseletricos.domain.entity.pessoa.Parentesco;
+import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
+import com.example.adaptadoreseletricos.domain.entity.pessoa.Sexo;
+import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
+import com.example.adaptadoreseletricos.service.pessoa.PessoaService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
