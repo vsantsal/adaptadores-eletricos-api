@@ -1,5 +1,10 @@
 package com.example.adaptadoreseletricos.domain.entity.pessoa;
 
 public enum Parentesco {
-    FILHO
+    FILHO, FILHA,
+    PAI, MAE,
+    TIO, TIA,
+    AVO,
+    SOBRINHO, SOBRINHA,
+    IRMAO, IRMA
 }
