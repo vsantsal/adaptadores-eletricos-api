@@ -1,8 +1,19 @@
-# APIs de Adaptadores elétricos
+APIs de Adaptadores elétricos
+=============================
 
 ![example workflow](https://github.com/vsantsal/adaptadores-eletricos-api/actions/workflows/maven.yml/badge.svg)
 ![framework_back](https://img.shields.io/badge/Spring_Boot-F2F4F9?style=for-the-badge&logo=spring-boot)
 ![server_ci](https://img.shields.io/badge/Github%20Actions-282a2e?style=for-the-badge&logo=githubactions&logoColor=367cfe)
+
+<!-- TOC -->
+* [APIs de Adaptadores elétricos](#apis-de-adaptadores-elétricos)
+  * [Modelagem básica](#modelagem-básica)
+  * [Escopo inicial](#escopo-inicial)
+    * [API de Cadastro de Endereços](#api-de-cadastro-de-endereços)
+    * [API de Cadastro de Eletrodomésticos](#api-de-cadastro-de-eletrodomésticos)
+    * [API de Cadastro de Pessoas](#api-de-cadastro-de-pessoas)
+  * [Resumo Desenvolvimento](#resumo-desenvolvimento)
+<!-- TOC -->
 
 Repositório de projeto com APIs para cadastro de pessoas, casas e eletrodomésticos, visando a calcular o consumo mensal de energia.
 
@@ -24,6 +35,7 @@ Criaremos testes de integração para os controllers para confirmar os principai
 
 Configuraremos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*).
 
+## APIs
 ### API de Cadastro de Endereços
 
 Nossa API Rest deve suportar a inclusão no cadastro de endereços, sobre os quais se calculará o consumo (mensal) de energia.
