@@ -28,3 +28,6 @@ replay_pid*
 
 # Configurações com credenciais
 application.properties
+
+#
+target
