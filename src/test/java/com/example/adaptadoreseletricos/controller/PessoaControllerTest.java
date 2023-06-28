@@ -5,6 +5,7 @@ import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Sexo;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.service.pessoa.PessoaService;
+import jakarta.persistence.EntityNotFoundException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -158,5 +159,20 @@ class PessoaControllerTest {
                         Matchers.is("FILHO")));
     }
 
+    @DisplayName("Teste de detalhamento de pessoa para Id inexistente na API")
+    @Test
+    public void test_nao_deve_detalhar_pessoa_para_id_invalido() throws Exception {
+        // Arrange
+        when(repository.getReferenceById(2L)).thenThrow(
+                EntityNotFoundException.class
+        );
+
+        // Act
+        this.mockMvc.perform(get(ENDPOINT + "/2"))
+
+                // Assert
+                .andExpect(status().isNotFound());
+
+    }
 
 }
