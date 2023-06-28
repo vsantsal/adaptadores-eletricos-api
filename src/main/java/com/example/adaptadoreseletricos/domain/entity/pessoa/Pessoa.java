@@ -23,7 +23,9 @@ public class Pessoa {
     @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
 
+    @Enumerated(EnumType.STRING)
     private Sexo sexo;
 
+    @Enumerated(EnumType.STRING)
     private Parentesco parentesco;
 }

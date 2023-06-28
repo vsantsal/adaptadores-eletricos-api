@@ -1,5 +1,6 @@
 package com.example.adaptadoreseletricos.controller;
 
+
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Parentesco;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Sexo;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -175,4 +177,26 @@ class PessoaControllerTest {
 
     }
 
+    @DisplayName("Teste com erro de integridade de dados no BD")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_provoca_erro_integridade_dados() throws Exception {
+        // Arrange
+        when(repository.save(any(Pessoa.class))).thenThrow(
+                DataIntegrityViolationException.class
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        post(ENDPOINT)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"Fulano de Tal\", " +
+                                                "\"dataNascimento\": \"1980-01-01\", " +
+                                                "\"sexo\": \"MASCULINO\", " +
+                                                "\"parentesco\": \"FILHO\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isConflict());
+    }
 }
