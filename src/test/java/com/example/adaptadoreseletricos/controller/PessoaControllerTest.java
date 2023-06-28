@@ -45,7 +45,7 @@ class PessoaControllerTest {
         when(repository.save(any(Pessoa.class))).thenReturn(
                 new Pessoa(
                         1L,
-                        "Fulano de tal",
+                        "F".repeat(120),
                         LocalDate.of(1980, 1, 1),
                         Sexo.MASCULINO,
                         Parentesco.FILHO
@@ -57,7 +57,7 @@ class PessoaControllerTest {
                 post(ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
-                                "{\"nome\": \"Fulano de Tal\", " +
+                                "{\"nome\": \"" + "F".repeat(120) + "\", " +
                                         "\"dataNascimento\": \"1980-01-01\", " +
                                         "\"sexo\": \"MASCULINO\", " +
                                         "\"parentesco\": \"FILHO\"}"
