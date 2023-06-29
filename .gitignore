@@ -29,5 +29,5 @@ replay_pid*
 # Configurações com credenciais
 application.properties
 
-#
+# arquivos gerados
 target
