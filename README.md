@@ -3,14 +3,16 @@ APIs de Adaptadores elétricos
 
 <!-- TOC -->
 * [APIs de Adaptadores elétricos](#apis-de-adaptadores-elétricos)
-* [Introdução](#introdução)
-* [Modelagem básica](#modelagem-básica)
-* [Escopo inicial](#escopo-inicial)
-* [APIs](#apis)
+* [👓 Introdução](#-introdução)
+* [🧑‍🔬 Modelagem básica](#-modelagem-básica)
+* [🔬 Escopo](#-escopo)
+* [📖 APIs](#-apis)
   * [API de Cadastro de Endereços](#api-de-cadastro-de-endereços)
   * [API de Cadastro de Eletrodomésticos](#api-de-cadastro-de-eletrodomésticos)
   * [API de Cadastro de Pessoas](#api-de-cadastro-de-pessoas)
-* [Resumo Desenvolvimento](#resumo-desenvolvimento)
+* [🗓️ Resumo Desenvolvimento](#-resumo-desenvolvimento)
+  * [Primeira fase](#primeira-fase)
+  * [Segunda fase](#segunda-fase)
 <!-- TOC -->
 
 # 👓 Introdução
@@ -28,7 +30,7 @@ Repositório de projeto com APIs para cadastro de pessoas, casas e eletrodomést
 
 O link no github é https://github.com/vsantsal/adaptadores-eletricos-api.
 
-# Modelagem básica
+# 🧑‍🔬 Modelagem básica
 
 Considerando a descrição básica do conjunto de APIs, consideraremos que, para cada Endereço, associamos M Pessoas e N Eletrodomésticos.
 
@@ -108,7 +110,9 @@ Em caso de sucesso, a aplicação deve informar a *location* do recurso criado.
 
 Se falha nos dados passados pelos clientes, deve informar o erro.
 
-# Resumo Desenvolvimento
+# 🗓️ Resumo Desenvolvimento
+
+## Primeira fase
 
 * O SGBD utilizado é o MySQL, conforme pode ser lido pelas dependências no `pom.xml`. Para versionamento e *migrations* dos scripts de criação de tabela, utilizamos a dependência `flyway`.
 * Adotamos testes de integração sobre os *controllers* para verificar se comportamento da solução está de acordo com o esperado. Para tanto, consultamos, dentre outras, as seguintes fontes:
@@ -117,3 +121,7 @@ Se falha nos dados passados pelos clientes, deve informar o erro.
 * Nos testes, preferimos *mockar* os repositórios, haja vista não termos adicionado nenhuma inteligência a eles, apenas herdamos as implementação da interface *JpaRepository*, em vez dos *services*, que codamos e poderiam ter alguma lógica escrita erroneamente (para tanto, anotamos essas últimas dependências nas classes de testes como `SpyBean`, que, segundo a [documentação](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/mock/mockito/SpyBean.html), faz utilizar a implementação real)
 * Configuramos *workflow* de execução de testes automáticos quando houver integração aos ramos principais (`develop`e `main`) por meio do *Github Actions*
 * Implementamos também métodos `GET` para os *endpoints*, haja vista a criação dos recursos pelo método *POST* em cada um desses endpoints.
+
+## Segunda fase
+
+* Implementação (entre a primeira e a segunda) de métrica de cobertura de código pelos testes, com habilitação do *github-actions bot* para gerar *badge*
