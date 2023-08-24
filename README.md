@@ -3,14 +3,16 @@ APIs de Adaptadores elétricos
 
 <!-- TOC -->
 * [APIs de Adaptadores elétricos](#apis-de-adaptadores-elétricos)
-* [Introdução](#introdução)
-* [Modelagem básica](#modelagem-básica)
-* [Escopo inicial](#escopo-inicial)
-* [APIs](#apis)
+* [👓 Introdução](#-introdução)
+* [🧑‍🔬 Modelagem básica](#-modelagem-básica)
+* [🔬 Escopo](#-escopo)
+* [📖 APIs](#-apis)
   * [API de Cadastro de Endereços](#api-de-cadastro-de-endereços)
   * [API de Cadastro de Eletrodomésticos](#api-de-cadastro-de-eletrodomésticos)
   * [API de Cadastro de Pessoas](#api-de-cadastro-de-pessoas)
-* [Resumo Desenvolvimento](#resumo-desenvolvimento)
+* [🗓️ Resumo Desenvolvimento](#-resumo-desenvolvimento)
+  * [Primeira fase](#primeira-fase)
+  * [Segunda fase](#segunda-fase)
 <!-- TOC -->
 
 # 👓 Introdução
