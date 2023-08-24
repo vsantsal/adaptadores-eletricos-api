@@ -32,9 +32,9 @@ O link no github é https://github.com/vsantsal/adaptadores-eletricos-api.
 
 # 🧑‍🔬 Modelagem básica
 
-Considerando a descrição básica do conjunto de APIs, consideraremos que, para cada Endereço, associamos M Pessoas e N Eletrodomésticos.
+Considerando os novos requisitos para a segunda, apresentamos a seguinte modelagem para as entidades da aplicação na segunda fase.
 
-![Diagrama de Classes](https://github.com/vsantsal/adaptadores-eletricos-api/blob/main/docs/V1_uml_aparelhos_domesticos.drawio.png)
+![Diagrama de Entidade Relacionamento](https://github.com/vsantsal/adaptadores-eletricos-api/blob/main/docs/V1_DER_aparelhos_domesticos.png)
 
 # 🔬 Escopo
 
