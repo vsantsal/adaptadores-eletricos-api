@@ -32,7 +32,7 @@ O link no github é https://github.com/vsantsal/adaptadores-eletricos-api.
 
 # 🧑‍🔬 Modelagem básica
 
-Considerando os novos requisitos para a segunda, apresentamos a seguinte modelagem para as entidades da aplicação na segunda fase.
+Considerando os novos requisitos para a segunda fase, apresentamos a seguinte modelagem para as entidades da aplicação na segunda fase.
 
 ![Diagrama de Entidade Relacionamento](https://github.com/vsantsal/adaptadores-eletricos-api/blob/main/docs/V1_DER_aparelhos_domesticos.png)
 
