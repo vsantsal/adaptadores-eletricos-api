@@ -48,11 +48,11 @@ Configuraremos *workflow* no Actions para executar os testes em integrações de
 # 📖 APIs
 ## API de Cadastro de Endereços
 
-Nossa API Rest deve suportar a inclusão no cadastro de endereços, sobre os quais se calculará o consumo (mensal) de energia.
+Nossa API Rest deve suportar a manutenção do cadastro de endereços, sobre os quais se calculará o consumo (mensal) de energia.
 
-O enpdpoint para o cadastro será `/enderecos`, através do método HTTP POST.
+O enpdpoint será baseado em `/enderecos`, suportando os métodos HTTP POST, GET, UPDATE, DELETE.
 
-O *body* de cada requisição deve informar JSON no seguinte formato:
+Para o POST, o *body* de cada requisição deve informar JSON no seguinte formato:
 
 ```json 
 {
@@ -70,11 +70,11 @@ Se falha nos dados passados pelos clientes, deve informar o erro.
 
 ## API de Cadastro de Eletrodomésticos
 
-Nossa API Rest deve suportar a inclusão no cadastro de eletrodomésticos.
+Nossa API Rest deve suportar a manutenção de eletrodomésticos.
 
-O enpdpoint para o cadastro será `/eletrodomesticos`, através do método HTTP POST.
+O enpdpoint será baseado em `/eletrodomesticos`, suportando os métodos HTTP POST, GET, UPDATE, DELETE.
 
-O *body* de cada requisição deve informar JSON no seguinte formato:
+Para o cadastro, o *body* de cada requisição deve informar JSON no seguinte formato:
 
 ```json 
 {
@@ -91,11 +91,11 @@ Se falha nos dados passados pelos clientes, deve informar o erro.
 
 ## API de Cadastro de Pessoas
 
-Nossa API Rest deve suportar a inclusão no cadastro de pessoas.
+Nossa API Rest deve suportar a manutenção de pessoas.
 
-O enpdpoint para o cadastro será `/pessoas`, através do método HTTP POST.
+O enpdpoint será baseado em `/pessoas`, suportando os métodos HTTP POST, GET, UPDATE, DELETE.
 
-O *body* de cada requisição deve informar JSON no seguinte formato:
+Para o cadastro, o *body* de cada requisição deve informar JSON no seguinte formato:
 
 ```json 
 {
