@@ -13,11 +13,15 @@ APIs de Adaptadores elétricos
 * [Resumo Desenvolvimento](#resumo-desenvolvimento)
 <!-- TOC -->
 
-# Introdução
+# 👓 Introdução
 
-![example workflow](https://github.com/vsantsal/adaptadores-eletricos-api/actions/workflows/maven.yml/badge.svg)
+![status_desenvolvimento](https://img.shields.io/static/v1?label=Status&message=Em%20Desenvolvimento&color=yellow&style=for-the-badge)
+![Badge Java](https://img.shields.io/static/v1?label=Java&message=17&color=orange&style=for-the-badge&logo=java)
+
 ![framework_back](https://img.shields.io/badge/Spring_Boot-F2F4F9?style=for-the-badge&logo=spring-boot)
 ![server_ci](https://img.shields.io/badge/Github%20Actions-282a2e?style=for-the-badge&logo=githubactions&logoColor=367cfe)
+
+![example workflow](https://github.com/vsantsal/adaptadores-eletricos-api/actions/workflows/maven.yml/badge.svg)
 ![Coverage](.github/badges/jacoco.svg)
 
 Repositório de projeto com APIs para cadastro de pessoas, casas e eletrodomésticos, visando a calcular o consumo mensal de energia.
@@ -30,17 +34,16 @@ Considerando a descrição básica do conjunto de APIs, consideraremos que, para
 
 ![Diagrama de Classes](https://github.com/vsantsal/adaptadores-eletricos-api/blob/main/docs/V1_uml_aparelhos_domesticos.drawio.png)
 
-# Escopo inicial
+# 🔬 Escopo
 
-Implementaremos inicialmente apenas as APIs de cadastro das entidades do domínio do problema.
+Implementaremos as APIs de cadastro das entidades do domínio do problema, com os 4 principais verbos HTTP (GET, POST, PUT, DELETE).
 
-Ainda não faremos a associação entre as entidades.
 
 Criaremos testes de integração para os controllers para confirmar os principais comportamentos.
 
 Configuraremos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*).
 
-# APIs
+# 📖 APIs
 ## API de Cadastro de Endereços
 
 Nossa API Rest deve suportar a inclusão no cadastro de endereços, sobre os quais se calculará o consumo (mensal) de energia.
