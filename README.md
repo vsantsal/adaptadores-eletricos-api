@@ -41,9 +41,9 @@ Considerando os novos requisitos para a segunda fase, apresentamos a seguinte mo
 Implementaremos as APIs de cadastro das entidades do domínio do problema, com os 4 principais verbos HTTP (GET, POST, PUT, DELETE).
 
 
-Criaremos testes de integração para os controllers para confirmar os principais comportamentos.
+Há testes de integração para os controllers de modo a confirmar os principais comportamentos.
 
-Configuraremos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*).
+Configuraos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*), além de permitir seu *bot* a atualizar a *badge* de cobertura de código pelos testes.
 
 # 📖 APIs
 ## API de Cadastro de Endereços
