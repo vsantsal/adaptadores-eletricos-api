@@ -1,9 +1,6 @@
 package com.example.adaptadoreseletricos.service.pessoa;
 
-import com.example.adaptadoreseletricos.domain.entity.pessoa.Parentesco;
-import com.example.adaptadoreseletricos.domain.entity.pessoa.ParentescoPessoas;
-import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
-import com.example.adaptadoreseletricos.domain.entity.pessoa.Usuario;
+import com.example.adaptadoreseletricos.domain.entity.pessoa.*;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.ParentescoPessoasRepository;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaCadastroDTO;
@@ -24,6 +21,14 @@ public class PessoaService {
 
     @Transactional
     public PessoaDetalheDTO salvar(PessoaCadastroDTO dto) {
+        // Valida sexo e parentesco no DTO
+        if (dto.parentesco() != null &&
+                !(Parentesco.valueOf(
+                        dto.parentesco()).getSexoCorrespondente()
+                        .equals(Sexo.valueOf(dto.sexo())))) {
+            throw new IllegalArgumentException("Sexo e Parentesco informados incompatíveis");
+        }
+
         // Salva pessoa informada pelo usuário logado
         Pessoa pessoaASalvar = dto.toPessoa();
         Pessoa pessoaSalva = this.pessoaRepository.save(pessoaASalvar);

@@ -245,4 +245,49 @@ class PessoaControllerTest {
                 .andExpect(header().string("Location", containsString(ENDPOINT + "/1")));
     }
 
+    @DisplayName("Teste usuário logado não pode se cadastrar pelo endpoint de gestão de pessoas")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_usuario_tenta_se_cadastrar_de_novo() throws Exception {
+        // Arrange/Act
+        this.mockMvc.perform(
+                        post(ENDPOINT)
+                                .with(user(usuarioTesteFeminino))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"" +
+                                                usuarioTesteFeminino.getPessoa().getNome()
+                                                + "\", " +
+                                                "\"dataNascimento\": " +
+                                                usuarioTesteFeminino.getPessoa().getDataNascimento()
+                                                + "\", " +
+                                                "\"sexo\": " +
+                                                usuarioTesteFeminino.getPessoa().getSexo()
+                                                + "}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @DisplayName("Teste aplicação valida coerência entre sexo e parentesco informados")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_parentesco_e_sexo_incoerentes() throws Exception {
+        // Arrange/Act
+        this.mockMvc.perform(
+                        post(ENDPOINT)
+                                .with(user(usuarioTesteFeminino))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"" + "F".repeat(120) + "\", " +
+                                                "\"dataNascimento\": \"1991-01-01\", " +
+                                                "\"sexo\": \"MASCULINO\", " +
+                                                "\"parentesco\": \"FILHA\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isBadRequest());
+
+    }
+
 }
