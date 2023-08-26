@@ -3,6 +3,8 @@ package com.example.adaptadoreseletricos.controller;
 
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Sexo;
+import com.example.adaptadoreseletricos.domain.entity.pessoa.Usuario;
+import com.example.adaptadoreseletricos.domain.repository.pessoa.ParentescoPessoasRepository;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.service.pessoa.PessoaService;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,6 +28,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,6 +42,24 @@ class PessoaControllerTest {
 
     private final String ENDPOINT = "/pessoas";
 
+    private final Usuario usuarioTesteMasculino = new Usuario(
+            "usuarioTesteMasculino",
+            "usuarioTesteMasculino",
+            new Pessoa(42L,
+                    "Usuario Teste Masculino",
+                    LocalDate.of(1971, 1, 1),
+                    Sexo.MASCULINO)
+            );
+
+    private final Usuario usuarioTesteFeminino = new Usuario(
+            "usuarioTesteFeminino",
+            "usuarioTesteFeminino",
+            new Pessoa(42L,
+                    "Usuario Teste Feminino",
+                    LocalDate.of(1971, 1, 1),
+                    Sexo.FEMININO)
+    );
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -46,14 +67,17 @@ class PessoaControllerTest {
     private PessoaService service;
 
     @MockBean
-    private PessoaRepository repository;
+    private PessoaRepository pessoaRepository;
 
-    @DisplayName("Teste de cadastro de pessoa com dados válidos na API")
+    @MockBean
+    private ParentescoPessoasRepository parentescoPessoasRepository;
+
+    @DisplayName("Teste de cadastro de pessoa com dados válidos na API sem informar parentesco")
     @WithMockUser(username = "tester")
     @Test
     public void test_deve_criar_pessoa_se_dados_informados_validos() throws Exception {
         // Arrange
-        when(repository.save(any(Pessoa.class))).thenReturn(
+        when(pessoaRepository.save(any(Pessoa.class))).thenReturn(
                 new Pessoa(
                         1L,
                         "F".repeat(120),
@@ -124,7 +148,7 @@ class PessoaControllerTest {
     @Test
     public void test_deve_detalhar_pessoa_para_id_valido() throws Exception {
         // Arrange
-        when(repository.getReferenceById(1L)).thenReturn(
+        when(pessoaRepository.getReferenceById(1L)).thenReturn(
                 new Pessoa(
                         1L,
                         "Ciclana de Só",
@@ -153,7 +177,7 @@ class PessoaControllerTest {
     @Test
     public void test_nao_deve_detalhar_pessoa_para_id_invalido() throws Exception {
         // Arrange
-        when(repository.getReferenceById(2L)).thenThrow(
+        when(pessoaRepository.getReferenceById(2L)).thenThrow(
                 EntityNotFoundException.class
         );
 
@@ -171,7 +195,7 @@ class PessoaControllerTest {
     @Test
     public void test_deve_informar_erro_requisicao_cliente_se_provoca_erro_integridade_dados() throws Exception {
         // Arrange
-        when(repository.save(any(Pessoa.class))).thenThrow(
+        when(pessoaRepository.save(any(Pessoa.class))).thenThrow(
                 DataIntegrityViolationException.class
         );
 
@@ -188,4 +212,37 @@ class PessoaControllerTest {
                 // Assert
                 .andExpect(status().isConflict());
     }
+
+    @DisplayName("Teste de cadastro de pessoa com dados válidos na API informando parentesco")
+    @Test
+    public void test_deve_criar_pessoa_se_dados_informados_validos_com_parentesco() throws Exception {
+        // Arrange
+        when(pessoaRepository.save(any(Pessoa.class))).thenReturn(
+                new Pessoa(
+                        1L,
+                        "F".repeat(120),
+                        LocalDate.of(1980, 1, 1),
+                        Sexo.MASCULINO
+                )
+        );
+
+
+        // Act
+        this.mockMvc.perform(
+                        post(ENDPOINT)
+                                .with(user(usuarioTesteMasculino))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"" + "F".repeat(120) + "\", " +
+                                                "\"dataNascimento\": \"1991-01-01\", " +
+                                                "\"sexo\": \"MASCULINO\", " +
+                                                "\"parentesco\": \"FILHO\"}"
+                                )
+                )
+                // Asset
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string("Location", containsString(ENDPOINT + "/1")));
+    }
+
 }
