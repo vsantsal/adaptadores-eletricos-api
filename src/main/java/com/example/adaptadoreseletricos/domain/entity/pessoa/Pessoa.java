@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -26,17 +27,16 @@ public class Pessoa {
     @Enumerated(EnumType.STRING)
     private Sexo sexo;
 
-    @Enumerated(EnumType.STRING)
-    private Parentesco parentesco;
-
     @OneToOne(mappedBy = "pessoa")
     private Usuario usuario;
 
-    public Pessoa(Long id, String nome, LocalDate dataNascimento, Sexo sexo, Parentesco parentesco){
+    @OneToMany(mappedBy = "pessoa2")
+    Set<ParentescoPessoas> parentes;
+
+    public Pessoa(Long id, String nome, LocalDate dataNascimento, Sexo sexo){
         this.id = id;
         this.nome = nome;
         this.dataNascimento = dataNascimento;
         this.sexo = sexo;
-        this.parentesco = parentesco;
     }
 }

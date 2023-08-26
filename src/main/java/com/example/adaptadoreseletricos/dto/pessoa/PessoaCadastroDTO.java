@@ -16,16 +16,13 @@ public record PessoaCadastroDTO(
         @NotNull
         LocalDate dataNascimento,
         @NotBlank
-        String sexo,
-        @NotBlank
-        String parentesco
+        String sexo
 ) {
     public Pessoa toPessoa() {
         Pessoa pessoa = new Pessoa();
         pessoa.setNome(nome());
         pessoa.setDataNascimento(dataNascimento());
         pessoa.setSexo(Sexo.valueOf(sexo()));
-        pessoa.setParentesco(Parentesco.valueOf(parentesco()));
         return pessoa;
     }
 }
