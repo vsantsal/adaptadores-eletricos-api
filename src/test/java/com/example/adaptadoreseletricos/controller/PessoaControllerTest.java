@@ -59,8 +59,7 @@ class PessoaControllerTest {
                         1L,
                         "F".repeat(120),
                         LocalDate.of(1980, 1, 1),
-                        Sexo.MASCULINO,
-                        Parentesco.FILHO
+                        Sexo.MASCULINO
                 )
         );
 
@@ -72,8 +71,7 @@ class PessoaControllerTest {
                         .content(
                                 "{\"nome\": \"" + "F".repeat(120) + "\", " +
                                         "\"dataNascimento\": \"1980-01-01\", " +
-                                        "\"sexo\": \"MASCULINO\", " +
-                                        "\"parentesco\": \"FILHO\"}"
+                                        "\"sexo\": \"MASCULINO\"}"
                         )
         )
                 // Asset
@@ -94,33 +92,11 @@ class PessoaControllerTest {
                         .content(
                                 "{\"nome\": \"Fulano de Tal\", " +
                                         "\"dataNascimento\": \"1980-01-01\", " +
-                                        "\"sexo\": \"INEXISTENTE\", " +
-                                        "\"parentesco\": \"FILHO\"}"
+                                        "\"sexo\": \"INEXISTENTE\"}"
                         )
         )
 
         // Assert
-                .andExpect(status().is4xxClientError());
-    }
-
-    @DisplayName("Teste de cadastro de pessoa com parentesco inválido")
-    @WithMockUser(username = "tester")
-    @Test
-    public void test_deve_informar_erro_requisicao_cliente_se_parentesco_invalido() throws Exception {
-        // Arrange/Act
-        this.mockMvc.perform(
-                        post(ENDPOINT)
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        "{\"nome\": \"Fulano de Tal\", " +
-                                                "\"dataNascimento\": \"1980-01-01\", " +
-                                                "\"sexo\": \"MASCULINO\", " +
-                                                "\"parentesco\": \"INEXISTENTE\"}"
-                                )
-                )
-
-                // Assert
                 .andExpect(status().is4xxClientError());
     }
 
@@ -136,8 +112,7 @@ class PessoaControllerTest {
                         .content(
                                 "{\"nome\": \"" + "Z".repeat(121) + "\", " +
                                         "\"dataNascimento\": \"1980-01-01\", " +
-                                        "\"sexo\": \"MASCULINO\", " +
-                                        "\"parentesco\": \"FILHO\"}"
+                                        "\"sexo\": \"MASCULINO\"}"
                         )
         )
                 // Assert
@@ -155,8 +130,7 @@ class PessoaControllerTest {
                         1L,
                         "Ciclana de Só",
                         LocalDate.of(1980, 1, 1),
-                        Sexo.FEMININO,
-                        Parentesco.FILHO
+                        Sexo.FEMININO
                 )
         );
 
@@ -172,9 +146,7 @@ class PessoaControllerTest {
                 .andExpect(jsonPath("$.dataNascimento",
                         Matchers.is("1980-01-01")))
                 .andExpect(jsonPath("$.sexo",
-                        Matchers.is("FEMININO")))
-                .andExpect(jsonPath("$.parentesco",
-                        Matchers.is("FILHO")));
+                        Matchers.is("FEMININO")));
     }
 
     @DisplayName("Teste de detalhamento de pessoa para Id inexistente na API")
@@ -211,8 +183,7 @@ class PessoaControllerTest {
                                 .content(
                                         "{\"nome\": \"Fulano de Tal\", " +
                                                 "\"dataNascimento\": \"1980-01-01\", " +
-                                                "\"sexo\": \"MASCULINO\", " +
-                                                "\"parentesco\": \"FILHO\"}"
+                                                "\"sexo\": \"MASCULINO\" }"
                                 )
                 )
                 // Assert

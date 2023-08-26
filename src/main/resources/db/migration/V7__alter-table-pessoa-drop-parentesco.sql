@@ -1,0 +1,1 @@
+alter table pessoa drop column parentesco;
