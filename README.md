@@ -7,6 +7,7 @@ APIs de Adaptadores elétricos
 * [🧑‍🔬 Modelagem básica](#-modelagem-básica)
 * [🔬 Escopo](#-escopo)
 * [📖 APIs](#-apis)
+  * [APIS  de autenticação](#apis--de-autenticação)
   * [API de Cadastro de Endereços](#api-de-cadastro-de-endereços)
   * [API de Cadastro de Eletrodomésticos](#api-de-cadastro-de-eletrodomésticos)
   * [API de Cadastro de Pessoas](#api-de-cadastro-de-pessoas)
@@ -46,6 +47,49 @@ Há testes de integração para os controllers de modo a confirmar os principais
 Configuraos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*), além de permitir seu *bot* a atualizar a *badge* de cobertura de código pelos testes.
 
 # 📖 APIs
+
+## APIS  de autenticação
+
+Nossa API Rest deve suportar cadastro e posterior login para usuários, disponíveis nos *endpoints* `auth/registrar` e `auth/login`, respectivamente.
+
+Para o POST em `auth/registrar`, o *body* de cada requisição deve informar JSON no seguinte formato:
+
+```json
+{
+    "login": "usuario.teste",
+    "senha": "123456789",
+    "pessoa": {
+        "nome": "Fulano de tal",
+        "dataNascimento": "1980-01-01",
+        "sexo": "MASCULINO"
+    }
+}
+
+```
+
+Em caso de cadastro bem sucedido, a aplicação retorna resposta com status HTTP usual (200).
+
+Caso haja nova tentativa de cadastro, a aplicação retornará o erro informando, conforme abaixo:
+
+```json
+{
+    "mensagem": "Usuário já cadastrado"
+}
+```
+
+Para o POST em `auth/login`, o *body* de cada requisição deve informar JSON no seguinte formato:
+
+```json
+{
+    "login": "usuario.teste",
+    "senha": "123456789"
+}
+```
+
+Em caso de login inválido, a aplicação retorna o status 403 (sem mensagem).
+
+Em caso de login bem sucedido, a aplicação retornará token JWT que o cliente deverá informar a cada nova solicitação.
+
 ## API de Cadastro de Endereços
 
 Nossa API Rest deve suportar a manutenção do cadastro de endereços, sobre os quais se calculará o consumo (mensal) de energia.
@@ -108,7 +152,17 @@ Para o cadastro, o *body* de cada requisição deve informar JSON no seguinte fo
 
 Em caso de sucesso, a aplicação deve informar a *location* do recurso criado.
 
+Importante observar que o parentesco informado é relativo ao usuário logado.
+
 Se falha nos dados passados pelos clientes, deve informar o erro.
+
+Por exemplo, caso cliente passe sexo e parentesco de pessoas incoerentes, a aplicação informará a resposta abaixo:
+
+```json
+{
+    "mensagem": "Sexo e Parentesco informados incompatíveis"
+}
+```
 
 # 🗓️ Resumo Desenvolvimento
 
@@ -128,3 +182,4 @@ Se falha nos dados passados pelos clientes, deve informar o erro.
 * Para cadastro de usuários e login na aplicação, adicionamos dependências [*Spring Security*](https://spring.io/projects/spring-security) e [*auth0/java-jwt*](https://github.com/auth0/java-jwt), baseados principalmente no curso [Spring Boot 3: aplique boas práticas e proteja uma API Rest](https://www.alura.com.br/curso-online-spring-boot-aplique-boas-praticas-proteja-api-rest) da Alura e no tutorial [Autenticação e Autorização com Spring Security e JWT Tokens](https://www.youtube.com/watch?v=5w-YCcOjPD0), de Fernanda Kipper;
 * Naturalmente, foi necessário atualizar os testes para considerar a nova dependência de segurança do projeto, por meio de anotações `@WithMockUser`, `@ActiveProfiles`, `@SpringBootTest`, `@AutoConfigureMockMvc`, além do método `.with(csrf())`;
 * Adicionamos dependência `h2` para execução dos testes no *Github Actions*;
+* Para criarmos o relacionamento de parentes entre pessoas, do tipo M:N, nos baseamos fortemente neste [tutorial do Baldeung](https://www.baeldung.com/jpa-many-to-many);
