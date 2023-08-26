@@ -28,4 +28,7 @@ public class Pessoa {
 
     @Enumerated(EnumType.STRING)
     private Parentesco parentesco;
+
+    @OneToOne(mappedBy = "pessoa")
+    private Usuario usuario;
 }
