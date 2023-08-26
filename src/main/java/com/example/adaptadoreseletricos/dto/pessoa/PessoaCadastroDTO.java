@@ -16,7 +16,9 @@ public record PessoaCadastroDTO(
         @NotNull
         LocalDate dataNascimento,
         @NotBlank
-        String sexo
+        String sexo,
+
+        String parentesco
 ) {
     public Pessoa toPessoa() {
         Pessoa pessoa = new Pessoa();
