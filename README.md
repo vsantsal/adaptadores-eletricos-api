@@ -183,3 +183,5 @@ Por exemplo, caso cliente passe sexo e parentesco de pessoas incoerentes, a apli
 * Naturalmente, foi necessário atualizar os testes para considerar a nova dependência de segurança do projeto, por meio de anotações `@WithMockUser`, `@ActiveProfiles`, `@SpringBootTest`, `@AutoConfigureMockMvc`, além do método `.with(csrf())`;
 * Adicionamos dependência `h2` para execução dos testes no *Github Actions*;
 * Para criarmos o relacionamento de parentes entre pessoas, do tipo M:N, nos baseamos fortemente neste [tutorial do Baldeung](https://www.baeldung.com/jpa-many-to-many);
+* Para criarmos *custom queries* que atualizassem a base no repositório da entidade associativa ParentescoPessoas, consultamos este [tutorial do Baldeung](https://www.baeldung.com/spring-data-jpa-modifying-annotation);
+* Haja vista a criação de consultas personalizadas, fizemos também teste de repositório para validar nossa implementação;
