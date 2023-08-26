@@ -32,27 +32,27 @@ O link no github é https://github.com/vsantsal/adaptadores-eletricos-api.
 
 # 🧑‍🔬 Modelagem básica
 
-Considerando a descrição básica do conjunto de APIs, consideraremos que, para cada Endereço, associamos M Pessoas e N Eletrodomésticos.
+Considerando os novos requisitos para a segunda fase, apresentamos a seguinte modelagem para as entidades da aplicação na segunda fase.
 
-![Diagrama de Classes](https://github.com/vsantsal/adaptadores-eletricos-api/blob/main/docs/V1_uml_aparelhos_domesticos.drawio.png)
+![Diagrama de Entidade Relacionamento](https://github.com/vsantsal/adaptadores-eletricos-api/blob/main/docs/V1_DER_aparelhos_domesticos.png)
 
 # 🔬 Escopo
 
 Implementaremos as APIs de cadastro das entidades do domínio do problema, com os 4 principais verbos HTTP (GET, POST, PUT, DELETE).
 
 
-Criaremos testes de integração para os controllers para confirmar os principais comportamentos.
+Há testes de integração para os controllers de modo a confirmar os principais comportamentos.
 
-Configuraremos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*).
+Configuraos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*), além de permitir seu *bot* a atualizar a *badge* de cobertura de código pelos testes.
 
 # 📖 APIs
 ## API de Cadastro de Endereços
 
-Nossa API Rest deve suportar a inclusão no cadastro de endereços, sobre os quais se calculará o consumo (mensal) de energia.
+Nossa API Rest deve suportar a manutenção do cadastro de endereços, sobre os quais se calculará o consumo (mensal) de energia.
 
-O enpdpoint para o cadastro será `/enderecos`, através do método HTTP POST.
+O enpdpoint será baseado em `/enderecos`, suportando os métodos HTTP POST, GET, UPDATE, DELETE.
 
-O *body* de cada requisição deve informar JSON no seguinte formato:
+Para o POST, o *body* de cada requisição deve informar JSON no seguinte formato:
 
 ```json 
 {
@@ -70,11 +70,11 @@ Se falha nos dados passados pelos clientes, deve informar o erro.
 
 ## API de Cadastro de Eletrodomésticos
 
-Nossa API Rest deve suportar a inclusão no cadastro de eletrodomésticos.
+Nossa API Rest deve suportar a manutenção de eletrodomésticos.
 
-O enpdpoint para o cadastro será `/eletrodomesticos`, através do método HTTP POST.
+O enpdpoint será baseado em `/eletrodomesticos`, suportando os métodos HTTP POST, GET, UPDATE, DELETE.
 
-O *body* de cada requisição deve informar JSON no seguinte formato:
+Para o cadastro, o *body* de cada requisição deve informar JSON no seguinte formato:
 
 ```json 
 {
@@ -91,11 +91,11 @@ Se falha nos dados passados pelos clientes, deve informar o erro.
 
 ## API de Cadastro de Pessoas
 
-Nossa API Rest deve suportar a inclusão no cadastro de pessoas.
+Nossa API Rest deve suportar a manutenção de pessoas.
 
-O enpdpoint para o cadastro será `/pessoas`, através do método HTTP POST.
+O enpdpoint será baseado em `/pessoas`, suportando os métodos HTTP POST, GET, UPDATE, DELETE.
 
-O *body* de cada requisição deve informar JSON no seguinte formato:
+Para o cadastro, o *body* de cada requisição deve informar JSON no seguinte formato:
 
 ```json 
 {
