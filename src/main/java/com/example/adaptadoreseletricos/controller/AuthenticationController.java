@@ -4,8 +4,10 @@ import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Usuario;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.UsuarioRepository;
+import com.example.adaptadoreseletricos.dto.usuario.LoginRespostaDTO;
 import com.example.adaptadoreseletricos.dto.usuario.RegistroDTO;
 import com.example.adaptadoreseletricos.dto.usuario.UsuarioDTO;
+import com.example.adaptadoreseletricos.infra.security.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,9 @@ public class AuthenticationController {
     @Autowired
     private PessoaRepository pessoaRepository;
 
+    @Autowired
+    private TokenService tokenService;
+
     @PostMapping("/login")
     public ResponseEntity login(
             @RequestBody @Valid UsuarioDTO dto
@@ -37,7 +42,9 @@ public class AuthenticationController {
         var usuarioSenha = new UsernamePasswordAuthenticationToken(dto.login(), dto.senha());
         var auth = authenticationManager.authenticate(usuarioSenha);
 
-        return ResponseEntity.ok().build();
+        var token = tokenService.gerarToken((Usuario) auth.getPrincipal());
+
+        return ResponseEntity.ok(new LoginRespostaDTO(token));
 
     }
 
