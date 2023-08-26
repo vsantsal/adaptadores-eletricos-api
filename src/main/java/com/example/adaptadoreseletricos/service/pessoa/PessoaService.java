@@ -61,4 +61,12 @@ public class PessoaService {
         Pessoa pessoa = pessoaRepository.getReferenceById(id);
         return new PessoaDetalheDTO(pessoa);
     }
+
+    @Transactional
+    public void excluir(Long id) {
+        var pessoaAExcluir = this.pessoaRepository.getReferenceById(id);
+        this.parentescoPessoasRepository.deleteByPessoa1(pessoaAExcluir);
+        this.parentescoPessoasRepository.deleteByPessoa2(pessoaAExcluir);
+        this.pessoaRepository.deleteById(id);
+    }
 }
