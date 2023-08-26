@@ -270,4 +270,24 @@ class PessoaControllerTest {
 
     }
 
+    @DisplayName("Teste aplicação valida coerência entre sexo e parentesco informados")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_parentesco_e_sexo_incoerentes() throws Exception {
+        // Arrange/Act
+        this.mockMvc.perform(
+                        post(ENDPOINT)
+                                .with(user(usuarioTesteFeminino))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"" + "F".repeat(120) + "\", " +
+                                                "\"dataNascimento\": \"1991-01-01\", " +
+                                                "\"sexo\": \"MASCULINO\", " +
+                                                "\"parentesco\": \"FILHA\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isBadRequest());
+
+    }
+
 }

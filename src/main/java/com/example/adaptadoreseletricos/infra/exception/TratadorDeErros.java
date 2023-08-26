@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class TratadorDeErros {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity tratarErroDevolvendo400(IllegalArgumentException exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        return ResponseEntity.badRequest().body(
+                new ErroSoComMensagemValidacao(exception.getMessage())
+        );
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
