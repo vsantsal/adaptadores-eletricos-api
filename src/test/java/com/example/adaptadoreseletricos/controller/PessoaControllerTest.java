@@ -245,4 +245,29 @@ class PessoaControllerTest {
                 .andExpect(header().string("Location", containsString(ENDPOINT + "/1")));
     }
 
+    @DisplayName("Teste usuário logado não pode se cadastrar pelo endpoint de gestão de pessoas")
+    @Test
+    public void test_deve_informar_erro_requisicao_cliente_se_usuario_tenta_se_cadastrar_de_novo() throws Exception {
+        // Arrange/Act
+        this.mockMvc.perform(
+                        post(ENDPOINT)
+                                .with(user(usuarioTesteFeminino))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"" +
+                                                usuarioTesteFeminino.getPessoa().getNome()
+                                                + "\", " +
+                                                "\"dataNascimento\": " +
+                                                usuarioTesteFeminino.getPessoa().getDataNascimento()
+                                                + "\", " +
+                                                "\"sexo\": " +
+                                                usuarioTesteFeminino.getPessoa().getSexo()
+                                                + "}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isBadRequest());
+
+    }
+
 }
