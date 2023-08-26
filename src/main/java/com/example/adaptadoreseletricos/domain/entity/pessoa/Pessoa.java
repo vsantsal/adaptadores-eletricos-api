@@ -31,4 +31,12 @@ public class Pessoa {
 
     @OneToOne(mappedBy = "pessoa")
     private Usuario usuario;
+
+    public Pessoa(Long id, String nome, LocalDate dataNascimento, Sexo sexo, Parentesco parentesco){
+        this.id = id;
+        this.nome = nome;
+        this.dataNascimento = dataNascimento;
+        this.sexo = sexo;
+        this.parentesco = parentesco;
+    }
 }
