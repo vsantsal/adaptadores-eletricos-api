@@ -5,10 +5,14 @@ import com.example.adaptadoreseletricos.domain.repository.pessoa.ParentescoPesso
 import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaCadastroDTO;
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaDetalheDTO;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class PessoaService {
@@ -64,9 +68,34 @@ public class PessoaService {
 
     @Transactional
     public void excluir(Long id) {
-        var pessoaAExcluir = this.pessoaRepository.getReferenceById(id);
-        this.parentescoPessoasRepository.deleteByPessoa1(pessoaAExcluir);
-        this.parentescoPessoasRepository.deleteByPessoa2(pessoaAExcluir);
+        this.parentescoPessoasRepository
+                .removerTodosParentescosDePessoa(id);
         this.pessoaRepository.deleteById(id);
+    }
+
+    public PessoaDetalheDTO atualizar(PessoaCadastroDTO dto) {
+        // Atualiza dados da pessoa
+        Pessoa pessoa = dto.toPessoa();
+        Example<Pessoa> exemplo = Example.of(pessoa);
+        List<Pessoa> pessoas = pessoaRepository.findAll(exemplo);
+
+        if (pessoas.isEmpty()) {
+            throw new EntityNotFoundException("Não há pessoa corresponde para atualizar");
+        }
+
+        Pessoa pessoaAAtualizar = pessoas.stream()
+                .findFirst()
+                .orElseThrow(EntityNotFoundException::new);
+        pessoaAAtualizar.setNome(dto.nome());
+        pessoaAAtualizar.setSexo(Sexo.valueOf(dto.sexo()));
+        pessoaAAtualizar.setDataNascimento(dto.dataNascimento());
+
+        // Atualiza parentesco com usuário
+        Parentesco novoParentesco = Parentesco.valueOf(dto.parentesco());
+
+        pessoaRepository.save(pessoaAAtualizar);
+
+        return new PessoaDetalheDTO(pessoaAAtualizar);
+
     }
 }

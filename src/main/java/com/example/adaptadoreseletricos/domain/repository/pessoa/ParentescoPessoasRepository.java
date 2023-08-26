@@ -5,13 +5,16 @@ import com.example.adaptadoreseletricos.domain.entity.pessoa.ParentescoPessoasCh
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
 import org.hibernate.annotations.SQLUpdate;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ParentescoPessoasRepository extends JpaRepository<
         ParentescoPessoas,
         ParentescoPessoasChave> {
 
-    void deleteByPessoa1(Pessoa pessoa);
+    @Modifying
+    @Query(value = "delete from ParentescoPessoas p where p.pessoa1.id = ?1 or p.pessoa2.id= ?1")
+    void removerTodosParentescosDePessoa(Long id);
 
-    void deleteByPessoa2(Pessoa pessoa);
 }
