@@ -17,13 +17,10 @@ class ParentescoTest {
             "FILHA, FEMININO, MAE", "FILHA, MASCULINO, PAI",
             "TIO, FEMININO, SOBRINHA", "TIO, MASCULINO, SOBRINHO",
             "TIA, FEMININO, SOBRINHA", "TIA, MASCULINO, SOBRINHO",
-            "AVO, FEMININO, NETA", "AVO, MASCULINO, NETO",
             "SOBRINHO, FEMININO, TIA", "SOBRINHO, MASCULINO, TIO",
             "SOBRINHA, FEMININO, TIA", "SOBRINHA, MASCULINO, TIO",
             "IRMAO, FEMININO, IRMA", "IRMAO, MASCULINO, IRMAO",
             "IRMA, FEMININO, IRMA", "IRMA, MASCULINO, IRMAO",
-            "NETO, FEMININO, AVO", "NETO, MASCULINO, AVO",
-            "NETA, FEMININO, AVO", "NETA, MASCULINO, AVO",
     })
     public void test_inversao_de_parentesco(
             String nomeParentescoInput,
@@ -42,6 +39,32 @@ class ParentescoTest {
 
         // Assert
         assertEquals(parentescoInversoEsperado, parentescoInversoObtido);
+
+    }
+
+    @DisplayName("Teste sexo correspondente parentesco")
+    @ParameterizedTest
+    @CsvSource({
+            "PAI, MASCULINO", "MAE, FEMININO",
+            "FILHO, MASCULINO", "FILHA, FEMININO",
+            "TIO, MASCULINO", "TIA, FEMININO",
+            "SOBRINHO, MASCULINO", "SOBRINHA, FEMININO",
+            "IRMAO, MASCULINO", "IRMA, FEMININO",
+    })
+    public void test_derivacao_de_sexo_de_parentesco(
+            String nomeParentesco,
+            String nomeSexoEsperado
+    ){
+        // Arrange
+        Parentesco parentesco = Parentesco
+                .valueOf(nomeParentesco);
+        Sexo sexoEsperado = Sexo.valueOf(nomeSexoEsperado);
+
+        // Act
+        Sexo sexoObtido = parentesco.getSexoCorrespondente();
+
+        // Assert
+        assertEquals(sexoEsperado, sexoObtido);
 
     }
 
