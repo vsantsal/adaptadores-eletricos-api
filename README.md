@@ -124,4 +124,6 @@ Se falha nos dados passados pelos clientes, deve informar o erro.
 
 ## Segunda fase
 
-* Implementação (entre a primeira e a segunda) de métrica de cobertura de código pelos testes, com habilitação do *github-actions bot* para gerar *badge*
+* Implementação (entre a primeira e a segunda) de métrica de cobertura de código pelos testes, com habilitação do *github-actions bot* para gerar *badge*;
+* Para cadastro de usuários e login na aplicação, adicionamos dependências [*Spring Security*](https://spring.io/projects/spring-security) e [*auth0/java-jwt*](https://github.com/auth0/java-jwt), baseados principalmente no curso [Spring Boot 3: aplique boas práticas e proteja uma API Rest](https://www.alura.com.br/curso-online-spring-boot-aplique-boas-praticas-proteja-api-rest) da Alura e no tutorial [Autenticação e Autorização com Spring Security e JWT Tokens](https://www.youtube.com/watch?v=5w-YCcOjPD0), de Fernanda Kipper;
+* Naturalmente, foi necessário atualizar os testes para considerar a nova dependência de segurança do projeto, por meio de anotações `@WithMockUser`, `@ActiveProfiles`, `@SpringBootTest`, `@AutoConfigureMockMvc`, além do método `.with(csrf())`;

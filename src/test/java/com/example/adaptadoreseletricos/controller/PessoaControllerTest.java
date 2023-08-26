@@ -11,11 +11,14 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -23,13 +26,16 @@ import java.time.LocalDate;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 
-@WebMvcTest(PessoaController.class)
+@ActiveProfiles("test")
+@SpringBootTest
+@AutoConfigureMockMvc
 class PessoaControllerTest {
 
     private final String ENDPOINT = "/pessoas";
@@ -44,6 +50,7 @@ class PessoaControllerTest {
     private PessoaRepository repository;
 
     @DisplayName("Teste de cadastro de pessoa com dados válidos na API")
+    @WithMockUser(username = "tester")
     @Test
     public void test_deve_criar_pessoa_se_dados_informados_validos() throws Exception {
         // Arrange
@@ -60,6 +67,7 @@ class PessoaControllerTest {
         // Act
         this.mockMvc.perform(
                 post(ENDPOINT)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 "{\"nome\": \"" + "F".repeat(120) + "\", " +
@@ -75,11 +83,13 @@ class PessoaControllerTest {
     }
 
     @DisplayName("Teste de cadastro de pessoa com sexo inválido")
+    @WithMockUser(username = "tester")
     @Test
     public void test_deve_informar_erro_requisicao_cliente_se_sexo_invalido() throws Exception {
         // Arrange/Act
         this.mockMvc.perform(
                 post(ENDPOINT)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 "{\"nome\": \"Fulano de Tal\", " +
@@ -94,11 +104,13 @@ class PessoaControllerTest {
     }
 
     @DisplayName("Teste de cadastro de pessoa com parentesco inválido")
+    @WithMockUser(username = "tester")
     @Test
     public void test_deve_informar_erro_requisicao_cliente_se_parentesco_invalido() throws Exception {
         // Arrange/Act
         this.mockMvc.perform(
                         post(ENDPOINT)
+                                .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         "{\"nome\": \"Fulano de Tal\", " +
@@ -113,11 +125,13 @@ class PessoaControllerTest {
     }
 
     @DisplayName("Teste de cadastro de pessoa com nome acima 120 caracteres retorna erro")
+    @WithMockUser(username = "tester")
     @Test
     public void test_deve_informar_erro_requisicao_cliente_se_nome_pessoa_muito_comprido() throws Exception {
         // Arrange/Act
         this.mockMvc.perform(
                 post(ENDPOINT)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 "{\"nome\": \"" + "Z".repeat(121) + "\", " +
@@ -132,6 +146,7 @@ class PessoaControllerTest {
     }
 
     @DisplayName("Teste de detalhamento de pessoa para id válido na API")
+    @WithMockUser(username = "tester")
     @Test
     public void test_deve_detalhar_pessoa_para_id_valido() throws Exception {
         // Arrange
@@ -146,7 +161,8 @@ class PessoaControllerTest {
         );
 
         // Act
-        this.mockMvc.perform(get(ENDPOINT +"/1"))
+        this.mockMvc.perform(get(ENDPOINT +"/1")
+                .with(csrf()))
                 // Assert
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id",
@@ -162,6 +178,7 @@ class PessoaControllerTest {
     }
 
     @DisplayName("Teste de detalhamento de pessoa para Id inexistente na API")
+    @WithMockUser(username = "tester")
     @Test
     public void test_nao_deve_detalhar_pessoa_para_id_invalido() throws Exception {
         // Arrange
@@ -170,7 +187,8 @@ class PessoaControllerTest {
         );
 
         // Act
-        this.mockMvc.perform(get(ENDPOINT + "/2"))
+        this.mockMvc.perform(get(ENDPOINT + "/2")
+                        .with(csrf()))
 
                 // Assert
                 .andExpect(status().isNotFound());
@@ -178,6 +196,7 @@ class PessoaControllerTest {
     }
 
     @DisplayName("Teste com erro de integridade de dados no BD")
+    @WithMockUser(username = "tester")
     @Test
     public void test_deve_informar_erro_requisicao_cliente_se_provoca_erro_integridade_dados() throws Exception {
         // Arrange
