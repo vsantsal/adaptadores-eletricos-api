@@ -39,11 +39,12 @@ public class PessoaController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity atualizar(
+            @PathVariable Long id,
             @RequestBody @Valid PessoaCadastroDTO dto
             ){
-        var dtoResposta = this.service.atualizar(dto);
+        var dtoResposta = this.service.atualizar(id, dto);
         return ResponseEntity.ok(dtoResposta);
     }
 

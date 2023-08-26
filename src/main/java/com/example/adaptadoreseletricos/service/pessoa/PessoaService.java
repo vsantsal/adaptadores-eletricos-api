@@ -73,25 +73,32 @@ public class PessoaService {
         this.pessoaRepository.deleteById(id);
     }
 
-    public PessoaDetalheDTO atualizar(PessoaCadastroDTO dto) {
+    @Transactional
+    public PessoaDetalheDTO atualizar(Long id, PessoaCadastroDTO dto) {
         // Atualiza dados da pessoa
-        Pessoa pessoa = dto.toPessoa();
-        Example<Pessoa> exemplo = Example.of(pessoa);
-        List<Pessoa> pessoas = pessoaRepository.findAll(exemplo);
-
-        if (pessoas.isEmpty()) {
-            throw new EntityNotFoundException("Não há pessoa corresponde para atualizar");
-        }
-
-        Pessoa pessoaAAtualizar = pessoas.stream()
-                .findFirst()
-                .orElseThrow(EntityNotFoundException::new);
+        Pessoa pessoaAAtualizar = pessoaRepository.getReferenceById(id);
         pessoaAAtualizar.setNome(dto.nome());
         pessoaAAtualizar.setSexo(Sexo.valueOf(dto.sexo()));
         pessoaAAtualizar.setDataNascimento(dto.dataNascimento());
 
         // Atualiza parentesco com usuário
+        var usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var pessoaLogada = usuario.getPessoa();
         Parentesco novoParentesco = Parentesco.valueOf(dto.parentesco());
+        Parentesco novoInversoDeParentesco = novoParentesco.getInversaoDeParentesco(
+                pessoaLogada.getSexo()
+        );
+        this.parentescoPessoasRepository.atualizarParentescoEntrePessoas(
+                pessoaLogada.getId(),
+                pessoaAAtualizar.getId(),
+                novoParentesco
+        );
+
+        this.parentescoPessoasRepository.atualizarParentescoEntrePessoas(
+                pessoaAAtualizar.getId(),
+                pessoaLogada.getId(),
+                novoInversoDeParentesco
+        );
 
         pessoaRepository.save(pessoaAAtualizar);
 
