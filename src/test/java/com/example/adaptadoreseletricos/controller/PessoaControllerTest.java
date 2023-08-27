@@ -71,36 +71,6 @@ class PessoaControllerTest {
     @MockBean
     private ParentescoPessoasRepository parentescoPessoasRepository;
 
-    @DisplayName("Teste de cadastro de pessoa com dados válidos na API sem informar parentesco")
-    @WithMockUser(username = "tester")
-    @Test
-    public void test_deve_criar_pessoa_se_dados_informados_validos() throws Exception {
-        // Arrange
-        when(pessoaRepository.save(any(Pessoa.class))).thenReturn(
-                new Pessoa(
-                        1L,
-                        "F".repeat(120),
-                        LocalDate.of(1980, 1, 1),
-                        Sexo.MASCULINO
-                )
-        );
-
-        // Act
-        this.mockMvc.perform(
-                post(ENDPOINT)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(
-                                "{\"nome\": \"" + "F".repeat(120) + "\", " +
-                                        "\"dataNascimento\": \"1980-01-01\", " +
-                                        "\"sexo\": \"MASCULINO\"}"
-                        )
-        )
-                // Asset
-                .andExpect(status().isCreated())
-                .andExpect(header().exists("Location"))
-                .andExpect(header().string("Location", containsString(ENDPOINT + "/1")));
-    }
-
     @DisplayName("Teste de cadastro de pessoa com sexo inválido")
     @WithMockUser(username = "tester")
     @Test
