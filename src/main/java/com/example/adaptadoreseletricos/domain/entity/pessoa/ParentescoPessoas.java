@@ -1,6 +1,7 @@
 package com.example.adaptadoreseletricos.domain.entity.pessoa;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -19,6 +20,7 @@ public class ParentescoPessoas {
     Pessoa pessoa2;
 
     @Enumerated(EnumType.STRING)
+    @Getter
     private Parentesco parentesco;
 
     public ParentescoPessoas(Pessoa pessoa1, Pessoa pessoa2, Parentesco parentesco) {

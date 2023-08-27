@@ -18,4 +18,7 @@ public interface ParentescoPessoasRepository extends JpaRepository<
     @Modifying
     @Query(value = "update ParentescoPessoas p set p.parentesco = ?3 where p.pessoa1.id = ?1 and p.pessoa2.id = ?2")
     void  atualizarParentescoEntrePessoas(Long idPessoa1, Long idPessoa2, Parentesco parentesco);
+
+    @Query(value = "select parentesco from ParentescoPessoas p  where p.pessoa1.id = ?1 and p.pessoa2.id = ?2")
+    Parentesco obterParentescoParaPessoas(Long idPessoa1, Long idPessoa2);
 }
