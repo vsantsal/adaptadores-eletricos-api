@@ -29,8 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -89,7 +88,6 @@ class PessoaControllerTest {
         // Act
         this.mockMvc.perform(
                 post(ENDPOINT)
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 "{\"nome\": \"" + "F".repeat(120) + "\", " +
@@ -110,7 +108,6 @@ class PessoaControllerTest {
         // Arrange/Act
         this.mockMvc.perform(
                 post(ENDPOINT)
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 "{\"nome\": \"Fulano de Tal\", " +
@@ -130,7 +127,6 @@ class PessoaControllerTest {
         // Arrange/Act
         this.mockMvc.perform(
                 post(ENDPOINT)
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 "{\"nome\": \"" + "Z".repeat(121) + "\", " +
@@ -158,8 +154,7 @@ class PessoaControllerTest {
         );
 
         // Act
-        this.mockMvc.perform(get(ENDPOINT +"/1")
-                .with(csrf()))
+        this.mockMvc.perform(get(ENDPOINT +"/1"))
                 // Assert
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id",
@@ -182,8 +177,7 @@ class PessoaControllerTest {
         );
 
         // Act
-        this.mockMvc.perform(get(ENDPOINT + "/2")
-                        .with(csrf()))
+        this.mockMvc.perform(get(ENDPOINT + "/2"))
 
                 // Assert
                 .andExpect(status().isNotFound());
@@ -288,6 +282,107 @@ class PessoaControllerTest {
                 // Assert
                 .andExpect(status().isBadRequest());
 
+    }
+
+    @DisplayName("Exclusão de pessoa retorna status 204 mesmo se id não existir")
+    @WithMockUser(username = "tester")
+    @Test
+    public void test_exclusao_de_pessoa_que_nao_estah_na_base() throws Exception {
+        // Act
+        this.mockMvc.perform(
+                delete(ENDPOINT + "/1")
+
+                )
+
+                // Assert
+                .andExpect(status().isNoContent());
+    }
+
+    @DisplayName("Exclusão de pessoa retorna status 204 com id existente")
+    @WithMockUser(username = "tester")
+    @Test
+    public void test_exclusao_de_pessoa_que_estah_na_base() throws Exception {
+        // Arrange
+        when(pessoaRepository.getReferenceById(1L)).thenReturn(
+                new Pessoa(
+                        43L,
+                        "Ciclana de Só",
+                        LocalDate.of(1980, 1, 1),
+                        Sexo.FEMININO
+                )
+        );
+        // Act
+        this.mockMvc.perform(
+                        delete(ENDPOINT + "/43")
+
+                )
+
+                // Assert
+                .andExpect(status().isNoContent());
+    }
+
+    @DisplayName("Deve atualizar com sucesso todas as informações para pessoa com relacionamento válido")
+    @Test
+    public void test_atualizacao_valida() throws Exception {
+        // Arrange
+        when(pessoaRepository.getReferenceById(1L)).thenReturn(
+                new Pessoa(
+                        1L,
+                        "F".repeat(120),
+                        LocalDate.of(2001, 1, 1),
+                        Sexo.MASCULINO
+                )
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        put( ENDPOINT + "/1")
+                                .with(user(usuarioTesteFeminino))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"Fulana\", " +
+                                                "\"dataNascimento\": \"2001-01-02\", " +
+                                                "\"parentesco\": \"FILHA\", " +
+                                                "\"sexo\": \"FEMININO\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$.nome",
+                        Matchers.is("Fulana")))
+                .andExpect(jsonPath("$.dataNascimento",
+                        Matchers.is("2001-01-02")))
+                .andExpect(jsonPath("$.parentesco",
+                        Matchers.is("FILHA")))
+                .andExpect(jsonPath("$.sexo",
+                        Matchers.is("FEMININO")))
+        ;
+    }
+
+    @DisplayName("Não pode atualizar dados para id inexistente")
+    @Test
+    public void test_atualizacao_invalida() throws Exception {
+        // Arrange
+        when(pessoaRepository.getReferenceById(1L)).thenThrow(
+                EntityNotFoundException.class
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        put( ENDPOINT + "/1")
+                                .with(user(usuarioTesteMasculino))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"Fulana\", " +
+                                                "\"dataNascimento\": \"2001-01-02\", " +
+                                                "\"parentesco\": \"FILHA\", " +
+                                                "\"sexo\": \"FEMININO\"}"
+                                ))
+                // Assert
+                .andExpect(status().isNotFound())
+        ;
     }
 
 }

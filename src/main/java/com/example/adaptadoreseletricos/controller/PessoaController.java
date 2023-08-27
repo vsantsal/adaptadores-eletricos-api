@@ -1,6 +1,7 @@
 package com.example.adaptadoreseletricos.controller;
 
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaCadastroDTO;
+import com.example.adaptadoreseletricos.dto.pessoa.PessoaDetalheDTO;
 import com.example.adaptadoreseletricos.service.pessoa.PessoaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,21 @@ public class PessoaController {
     ){
         var dto = this.service.detalhar(id);
         return ResponseEntity.ok(dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity excluir(@PathVariable Long id){
+        this.service.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid PessoaCadastroDTO dto
+            ){
+        var dtoResposta = this.service.atualizar(id, dto);
+        return ResponseEntity.ok(dtoResposta);
     }
 
 }

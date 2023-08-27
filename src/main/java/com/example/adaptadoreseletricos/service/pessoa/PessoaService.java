@@ -4,11 +4,16 @@ import com.example.adaptadoreseletricos.domain.entity.pessoa.*;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.ParentescoPessoasRepository;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaCadastroDTO;
+import com.example.adaptadoreseletricos.dto.pessoa.PessoaComParentescoDTO;
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaDetalheDTO;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class PessoaService {
@@ -60,5 +65,45 @@ public class PessoaService {
     public PessoaDetalheDTO detalhar(Long id) {
         Pessoa pessoa = pessoaRepository.getReferenceById(id);
         return new PessoaDetalheDTO(pessoa);
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+        this.parentescoPessoasRepository
+                .removerTodosParentescosDePessoa(id);
+        this.pessoaRepository.deleteById(id);
+    }
+
+    @Transactional
+    public PessoaComParentescoDTO atualizar(Long id, PessoaCadastroDTO dto) {
+        // Atualiza dados da pessoa
+        Pessoa pessoaAAtualizar = pessoaRepository.getReferenceById(id);
+        pessoaAAtualizar.setNome(dto.nome());
+        pessoaAAtualizar.setSexo(Sexo.valueOf(dto.sexo()));
+        pessoaAAtualizar.setDataNascimento(dto.dataNascimento());
+
+        // Atualiza parentesco com usuário
+        var usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var pessoaLogada = usuario.getPessoa();
+        Parentesco novoParentesco = Parentesco.valueOf(dto.parentesco());
+        Parentesco novoInversoDeParentesco = novoParentesco.getInversaoDeParentesco(
+                pessoaLogada.getSexo()
+        );
+        this.parentescoPessoasRepository.atualizarParentescoEntrePessoas(
+                pessoaLogada.getId(),
+                pessoaAAtualizar.getId(),
+                novoParentesco
+        );
+
+        this.parentescoPessoasRepository.atualizarParentescoEntrePessoas(
+                pessoaAAtualizar.getId(),
+                pessoaLogada.getId(),
+                novoInversoDeParentesco
+        );
+
+        pessoaRepository.save(pessoaAAtualizar);
+
+        return new PessoaComParentescoDTO(pessoaAAtualizar, novoParentesco);
+
     }
 }
