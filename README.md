@@ -179,6 +179,12 @@ Para o UPDATE, deve-se passar  o id da pessoa a atualizar no endpoint (por exemp
 
 A aplicação fará as atualizações dos campos e retornará o STATUS CODE 200, em caso de sucesso.
 
+O GET no endpoint pode ser realizado complementando com ID ou não.
+
+Se ID for informado, retornará a pessoa buscada. 
+
+Sem ID, todas as pessoas com parentesco serão apresentadas. Pode-se utilizar ainda `nome`, `sexo`, `dataNascimento`e `parentesco` com parâmetros de pesquisa. 
+
 
 # 🗓️ Resumo Desenvolvimento
 
