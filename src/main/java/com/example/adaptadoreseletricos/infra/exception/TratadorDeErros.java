@@ -1,5 +1,6 @@
 package com.example.adaptadoreseletricos.infra.exception;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class TratadorDeErros {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity tratarErroDevolvendo400(IllegalArgumentException exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        return ResponseEntity.badRequest().body(
+                new ErroSoComMensagemValidacao(exception.getMessage())
+        );
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -34,9 +37,20 @@ public class TratadorDeErros {
         );
     }
 
+    @ExceptionHandler(EntityExistsException.class)
+    public  ResponseEntity tratarErro400(EntityExistsException exception) {
+        return ResponseEntity.badRequest().body(
+                new ErroSoComMensagemValidacao(exception.getMessage())
+        );
+    }
+
     private record DadosErrosValidacao(String campo, String mensagem) {
         public DadosErrosValidacao(FieldError erro) {
             this(erro.getField(), erro.getDefaultMessage());
         }
+    }
+
+    private record ErroSoComMensagemValidacao(String mensagem){
+
     }
 }

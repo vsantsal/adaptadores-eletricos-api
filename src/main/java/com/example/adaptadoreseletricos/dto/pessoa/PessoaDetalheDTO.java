@@ -11,13 +11,11 @@ public record PessoaDetalheDTO(
 
         LocalDate dataNascimento,
 
-        String sexo,
-
-        String parentesco
+        String sexo
 ) {
     public PessoaDetalheDTO(Pessoa pessoa){
 
         this(pessoa.getId(), pessoa.getNome(), pessoa.getDataNascimento(),
-                pessoa.getSexo().toString(), pessoa.getParentesco().toString());
+                pessoa.getSexo().toString());
     }
 }
