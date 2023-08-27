@@ -321,4 +321,44 @@ class PessoaControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    @DisplayName("Deve atualizar com sucesso todas as informações para pessoa com relacionamento válido")
+    @Test
+    public void test_atualizacao_valida() throws Exception {
+        // Arrange
+        when(pessoaRepository.getReferenceById(1L)).thenReturn(
+                new Pessoa(
+                        1L,
+                        "F".repeat(120),
+                        LocalDate.of(2001, 1, 1),
+                        Sexo.MASCULINO
+                )
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        put( ENDPOINT + "/1")
+                                .with(user(usuarioTesteFeminino))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"Fulana\", " +
+                                                "\"dataNascimento\": \"2001-01-02\", " +
+                                                "\"parentesco\": \"FILHA\", " +
+                                                "\"sexo\": \"FEMININO\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$.nome",
+                        Matchers.is("Fulana")))
+                .andExpect(jsonPath("$.dataNascimento",
+                        Matchers.is("2001-01-02")))
+                .andExpect(jsonPath("$.parentesco",
+                        Matchers.is("FILHA")))
+                .andExpect(jsonPath("$.sexo",
+                        Matchers.is("FEMININO")))
+        ;
+    }
+
 }

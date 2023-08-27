@@ -4,6 +4,7 @@ import com.example.adaptadoreseletricos.domain.entity.pessoa.*;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.ParentescoPessoasRepository;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaCadastroDTO;
+import com.example.adaptadoreseletricos.dto.pessoa.PessoaComParentescoDTO;
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaDetalheDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +75,7 @@ public class PessoaService {
     }
 
     @Transactional
-    public PessoaDetalheDTO atualizar(Long id, PessoaCadastroDTO dto) {
+    public PessoaComParentescoDTO atualizar(Long id, PessoaCadastroDTO dto) {
         // Atualiza dados da pessoa
         Pessoa pessoaAAtualizar = pessoaRepository.getReferenceById(id);
         pessoaAAtualizar.setNome(dto.nome());
@@ -102,7 +103,7 @@ public class PessoaService {
 
         pessoaRepository.save(pessoaAAtualizar);
 
-        return new PessoaDetalheDTO(pessoaAAtualizar);
+        return new PessoaComParentescoDTO(pessoaAAtualizar, novoParentesco);
 
     }
 }
