@@ -361,4 +361,28 @@ class PessoaControllerTest {
         ;
     }
 
+    @DisplayName("Não pode atualizar dados para id inexistente")
+    @Test
+    public void test_atualizacao_invalida() throws Exception {
+        // Arrange
+        when(pessoaRepository.getReferenceById(1L)).thenThrow(
+                EntityNotFoundException.class
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        put( ENDPOINT + "/1")
+                                .with(user(usuarioTesteMasculino))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"Fulana\", " +
+                                                "\"dataNascimento\": \"2001-01-02\", " +
+                                                "\"parentesco\": \"FILHA\", " +
+                                                "\"sexo\": \"FEMININO\"}"
+                                ))
+                // Assert
+                .andExpect(status().isNotFound())
+        ;
+    }
+
 }
