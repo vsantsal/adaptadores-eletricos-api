@@ -164,6 +164,22 @@ Por exemplo, caso cliente passe sexo e parentesco de pessoas incoerentes, a apli
 }
 ```
 
+Para o DELETE, deve-se passar o id da pessoa a remover no endpoint (por exemplo, `pessoas/42`). A aplicação promoverá a exclusão e retornar o STATUS CODE 204.
+
+Para o UPDATE, deve-se passar  o id da pessoa a atualizar no endpoint (por exemplo, `pessoas/42`) e os novos valores para os campos no corpo da requisição, conforme abaixo:
+
+```json 
+{
+  "nome": "Fulano de tal 2",
+  "dataNascimento": "1980-01-01",
+  "sexo": "MASCULINO",
+  "parentesco": "PAI"
+}
+```
+
+A aplicação fará as atualizações dos campos e retornará o STATUS CODE 200, em caso de sucesso.
+
+
 # 🗓️ Resumo Desenvolvimento
 
 ## Primeira fase
