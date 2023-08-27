@@ -107,10 +107,18 @@ public class PessoaService {
     public List<PessoaComParentescoDTO> listar(PessoaCadastroDTO paramPesquisa) {
         Pessoa pessoaLogada = getPessoaLogada();
         Pessoa pessoa = paramPesquisa.toPessoa();
+        Parentesco parentescoPesquisa = paramPesquisa.parentesco() != null ? Parentesco.valueOf(paramPesquisa.parentesco()): null;
         Example<Pessoa> exemplo = Example.of(pessoa);
         List<Pessoa> parentes = pessoaRepository.findAll(exemplo);
         return parentes
                 .stream()
+                .filter(
+                        p -> (parentescoPesquisa == null ||
+                                parentescoPessoasRepository.obterParentescoParaPessoas(
+                                        pessoaLogada.getId(),
+                                        p.getId()) == parentescoPesquisa
+                        )
+                )
                 .filter(p ->
                         parentescoPessoasRepository.obterParentescoParaPessoas(
                                 pessoaLogada.getId(), p.getId()

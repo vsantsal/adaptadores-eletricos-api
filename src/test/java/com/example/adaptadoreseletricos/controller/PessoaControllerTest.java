@@ -534,4 +534,49 @@ class PessoaControllerTest {
 
     }
 
+    @DisplayName("Listagem de parentes para repositório usuário, utros parentes e filtro parentesco")
+    @Test
+    public void test_listagem_de_parentes_para_repositorio_com_usuario_e_parentes_filtro_parentesco() throws Exception {
+        // Arrange
+        Pessoa terceiraPessoa = new Pessoa(44L, "44", LocalDate.now(), Sexo.FEMININO);
+        when(pessoaRepository.findAll(ArgumentMatchers.isA(Example.class))).thenReturn(
+                List.of(
+                        usuarioTesteFeminino.getPessoa(),
+                        usuarioTesteMasculino.getPessoa(),
+                        terceiraPessoa
+                )
+        );
+        when(parentescoPessoasRepository.obterParentescoParaPessoas(
+                usuarioTesteFeminino.getPessoa().getId(),
+                usuarioTesteMasculino.getPessoa().getId()
+        )).thenReturn(Parentesco.PAI);
+        when(parentescoPessoasRepository.obterParentescoParaPessoas(
+                usuarioTesteFeminino.getPessoa().getId(),
+                terceiraPessoa.getId()
+        )).thenReturn(Parentesco.MAE);
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT)
+                                .param("parentesco", "PAI")
+                                .with(user(usuarioTesteFeminino))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getId().intValue())))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getNome())))
+                .andExpect(jsonPath("$[0].dataNascimento",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getDataNascimento().toString())))
+                .andExpect(jsonPath("$[0].sexo",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getSexo().toString())))
+                .andExpect(jsonPath("$[0].parentesco",
+                        Matchers.is(Parentesco.PAI.name())))
+        ;
+
+    }
+
 }
