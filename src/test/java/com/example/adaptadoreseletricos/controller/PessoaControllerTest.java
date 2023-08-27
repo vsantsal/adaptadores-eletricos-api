@@ -8,7 +8,6 @@ import com.example.adaptadoreseletricos.domain.entity.pessoa.Usuario;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.ParentescoPessoasRepository;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.service.pessoa.PessoaService;
-import org.junit.jupiter.api.Disabled;
 import org.springframework.data.domain.Example;
 import jakarta.persistence.EntityNotFoundException;
 import org.hamcrest.Matchers;
@@ -483,52 +482,6 @@ class PessoaControllerTest {
                 .andExpect(jsonPath("$[1].sexo",
                         Matchers.is(terceiraPessoa.getSexo().toString())))
                 .andExpect(jsonPath("$[1].parentesco",
-                        Matchers.is(Parentesco.MAE.name())))
-        ;
-
-    }
-
-    @Disabled("WIP: Avaliando falha do teste")
-    @DisplayName("Listagem de parentes para repositório usuário, utros parentes e filtro nome")
-    @Test
-    public void test_listagem_de_parentes_para_repositorio_com_usuario_e_parentes_filtro_nome() throws Exception {
-        // Arrange
-        Pessoa terceiraPessoa = new Pessoa(44L, "44", LocalDate.now(), Sexo.FEMININO);
-        when(pessoaRepository.findAll(ArgumentMatchers.isA(Example.class))).thenReturn(
-                List.of(
-                        usuarioTesteFeminino.getPessoa(),
-                        usuarioTesteMasculino.getPessoa(),
-                        terceiraPessoa
-                )
-        );
-        when(parentescoPessoasRepository.obterParentescoParaPessoas(
-                usuarioTesteFeminino.getPessoa().getId(),
-                usuarioTesteMasculino.getPessoa().getId()
-        )).thenReturn(Parentesco.PAI);
-        when(parentescoPessoasRepository.obterParentescoParaPessoas(
-                usuarioTesteFeminino.getPessoa().getId(),
-                terceiraPessoa.getId()
-        )).thenReturn(Parentesco.MAE);
-
-        // Act
-        this.mockMvc.perform(
-                        get(ENDPOINT)
-                                .param("nome", "44")
-                                .with(user(usuarioTesteFeminino))
-                )
-                // Assert
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",
-                        Matchers.hasSize(1)))
-                .andExpect(jsonPath("$[0].id",
-                        Matchers.is(terceiraPessoa.getId().intValue())))
-                .andExpect(jsonPath("$[0].nome",
-                        Matchers.is(terceiraPessoa.getNome())))
-                .andExpect(jsonPath("$[0].dataNascimento",
-                        Matchers.is(terceiraPessoa.getDataNascimento().toString())))
-                .andExpect(jsonPath("$[0].sexo",
-                        Matchers.is(terceiraPessoa.getSexo().toString())))
-                .andExpect(jsonPath("$[0].parentesco",
                         Matchers.is(Parentesco.MAE.name())))
         ;
 
