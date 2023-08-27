@@ -37,12 +37,10 @@ public class PessoaService {
         // Salva pessoa informada pelo usuário logado
         Pessoa pessoaASalvar = dto.toPessoa();
         Pessoa pessoaSalva = this.pessoaRepository.save(pessoaASalvar);
-
+        Pessoa pessoaLogada = getPessoaLogada();
         // Salva relacionamentos de parentesco, caso tenha sido informado
         if (dto.parentesco() != null) {
             Parentesco parentesco = Parentesco.valueOf(dto.parentesco());
-            var usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            var pessoaLogada = usuario.getPessoa();
             // salva relacionamento da pessoa cadastrada com o usuário logado
             this.parentescoPessoasRepository.save(
                     new ParentescoPessoas(
@@ -83,8 +81,7 @@ public class PessoaService {
         pessoaAAtualizar.setDataNascimento(dto.dataNascimento());
 
         // Atualiza parentesco com usuário
-        var usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var pessoaLogada = usuario.getPessoa();
+        Pessoa pessoaLogada = getPessoaLogada();
         Parentesco novoParentesco = Parentesco.valueOf(dto.parentesco());
         Parentesco novoInversoDeParentesco = novoParentesco.getInversaoDeParentesco(
                 pessoaLogada.getSexo()
@@ -106,4 +103,40 @@ public class PessoaService {
         return new PessoaComParentescoDTO(pessoaAAtualizar, novoParentesco);
 
     }
+
+    public List<PessoaComParentescoDTO> listar(PessoaCadastroDTO paramPesquisa) {
+        Pessoa pessoaLogada = getPessoaLogada();
+        Pessoa pessoa = paramPesquisa.toPessoa();
+        Parentesco parentescoPesquisa = paramPesquisa.parentesco() != null ? Parentesco.valueOf(paramPesquisa.parentesco()): null;
+        Example<Pessoa> exemplo = Example.of(pessoa);
+        List<Pessoa> parentes = pessoaRepository.findAll(exemplo);
+        return parentes
+                .stream()
+                .filter(
+                        p -> (parentescoPesquisa == null ||
+                                parentescoPessoasRepository.obterParentescoParaPessoas(
+                                        pessoaLogada.getId(),
+                                        p.getId()) == parentescoPesquisa
+                        )
+                )
+                .filter(p ->
+                        parentescoPessoasRepository.obterParentescoParaPessoas(
+                                pessoaLogada.getId(), p.getId()
+                        ) != null)
+                .map(
+                        p -> new PessoaComParentescoDTO(
+                                p,
+                                parentescoPessoasRepository.obterParentescoParaPessoas(
+                                        pessoaLogada.getId(), p.getId()
+                                )
+                        )
+
+                ).toList();
+    }
+
+    private Pessoa getPessoaLogada(){
+        var usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return usuario.getPessoa();
+    }
+
 }

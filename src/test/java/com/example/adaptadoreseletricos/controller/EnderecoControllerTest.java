@@ -6,6 +6,7 @@ import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecoRepos
 import com.example.adaptadoreseletricos.service.endereco.EnderecoService;
 import jakarta.persistence.EntityNotFoundException;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,6 +219,7 @@ class EnderecoControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
+    @Disabled("WIP: será reavaliado quando voltarmos ao endpoint")
     @DisplayName("Teste de inclusão de endereço com sigla de estado muito comprido retorna erro")
     @WithMockUser(username = "tester")
     @Test

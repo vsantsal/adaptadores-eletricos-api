@@ -22,9 +22,15 @@ public record PessoaCadastroDTO(
 ) {
     public Pessoa toPessoa() {
         Pessoa pessoa = new Pessoa();
-        pessoa.setNome(nome());
-        pessoa.setDataNascimento(dataNascimento());
-        pessoa.setSexo(Sexo.valueOf(sexo()));
+        if (nome() != null) {
+            pessoa.setNome(nome());
+        }
+        if (dataNascimento() != null){
+            pessoa.setDataNascimento(dataNascimento());
+        }
+        if (sexo() != null){
+            pessoa.setSexo(Sexo.valueOf(sexo()));
+        }
         return pessoa;
     }
 }
