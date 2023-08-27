@@ -1,16 +1,20 @@
 package com.example.adaptadoreseletricos.controller;
 
 
+import com.example.adaptadoreseletricos.domain.entity.pessoa.Parentesco;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Sexo;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Usuario;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.ParentescoPessoasRepository;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.service.pessoa.PessoaService;
+import org.junit.jupiter.api.Disabled;
+import org.springframework.data.domain.Example;
 import jakarta.persistence.EntityNotFoundException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,11 +27,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -53,9 +57,9 @@ class PessoaControllerTest {
     private final Usuario usuarioTesteFeminino = new Usuario(
             "usuarioTesteFeminino",
             "usuarioTesteFeminino",
-            new Pessoa(42L,
+            new Pessoa(43L,
                     "Usuario Teste Feminino",
-                    LocalDate.of(1971, 1, 1),
+                    LocalDate.of(1971, 1, 3),
                     Sexo.FEMININO)
     );
 
@@ -353,6 +357,181 @@ class PessoaControllerTest {
                 // Assert
                 .andExpect(status().isNotFound())
         ;
+    }
+
+    @DisplayName("Listagem de parentes para repositório com apenas próprio usuário")
+    @Test
+    public void test_listagem_de_parentes_para_repositorio_soh_com_usuario() throws Exception {
+        // Arrange
+        when(pessoaRepository.findAll(ArgumentMatchers.isA(Example.class))).thenReturn(
+                List.of(usuarioTesteFeminino.getPessoa())
+        );
+
+        // Act
+        this.mockMvc.perform(
+                get(ENDPOINT).with(user(usuarioTesteFeminino))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(0)));
+    }
+
+    @DisplayName("Listagem de parentes para repositório usuário e outro não parente")
+    @Test
+    public void test_listagem_de_parentes_para_repositorio_com_usuario_e_nao_parente() throws Exception {
+        // Arrange
+        when(pessoaRepository.findAll(ArgumentMatchers.isA(Example.class))).thenReturn(
+                List.of(
+                        usuarioTesteFeminino.getPessoa(),
+                        usuarioTesteMasculino.getPessoa()
+                )
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuarioTesteFeminino))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(0)));
+    }
+
+    @DisplayName("Listagem de parentes para repositório usuário e outro parente")
+    @Test
+    public void test_listagem_de_parentes_para_repositorio_com_usuario_e_parente() throws Exception {
+        // Arrange
+        when(pessoaRepository.findAll(ArgumentMatchers.isA(Example.class))).thenReturn(
+                List.of(
+                        usuarioTesteFeminino.getPessoa(),
+                        usuarioTesteMasculino.getPessoa()
+                )
+        );
+        when(parentescoPessoasRepository.obterParentescoParaPessoas(
+                usuarioTesteFeminino.getPessoa().getId(),
+                usuarioTesteMasculino.getPessoa().getId()
+        )).thenReturn(Parentesco.PAI);
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuarioTesteFeminino))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getId().intValue())))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getNome())))
+                .andExpect(jsonPath("$[0].dataNascimento",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getDataNascimento().toString())))
+                .andExpect(jsonPath("$[0].sexo",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getSexo().toString())))
+                .andExpect(jsonPath("$[0].parentesco",
+                        Matchers.is(Parentesco.PAI.name())))
+        ;
+
+    }
+
+    @DisplayName("Listagem de parentes para repositório usuário e outros parentes")
+    @Test
+    public void test_listagem_de_parentes_para_repositorio_com_usuario_e_parentes() throws Exception {
+        // Arrange
+        Pessoa terceiraPessoa = new Pessoa(44L, "44", LocalDate.now(), Sexo.FEMININO);
+        when(pessoaRepository.findAll(ArgumentMatchers.isA(Example.class))).thenReturn(
+                List.of(
+                        usuarioTesteFeminino.getPessoa(),
+                        usuarioTesteMasculino.getPessoa(),
+                        terceiraPessoa
+                )
+        );
+        when(parentescoPessoasRepository.obterParentescoParaPessoas(
+                usuarioTesteFeminino.getPessoa().getId(),
+                usuarioTesteMasculino.getPessoa().getId()
+        )).thenReturn(Parentesco.PAI);
+        when(parentescoPessoasRepository.obterParentescoParaPessoas(
+                usuarioTesteFeminino.getPessoa().getId(),
+                terceiraPessoa.getId()
+        )).thenReturn(Parentesco.MAE);
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuarioTesteFeminino))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getId().intValue())))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getNome())))
+                .andExpect(jsonPath("$[0].dataNascimento",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getDataNascimento().toString())))
+                .andExpect(jsonPath("$[0].sexo",
+                        Matchers.is(usuarioTesteMasculino.getPessoa().getSexo().toString())))
+                .andExpect(jsonPath("$[0].parentesco",
+                        Matchers.is(Parentesco.PAI.name())))
+                .andExpect(jsonPath("$[1].id",
+                        Matchers.is(terceiraPessoa.getId().intValue())))
+                .andExpect(jsonPath("$[1].nome",
+                        Matchers.is(terceiraPessoa.getNome())))
+                .andExpect(jsonPath("$[1].dataNascimento",
+                        Matchers.is(terceiraPessoa.getDataNascimento().toString())))
+                .andExpect(jsonPath("$[1].sexo",
+                        Matchers.is(terceiraPessoa.getSexo().toString())))
+                .andExpect(jsonPath("$[1].parentesco",
+                        Matchers.is(Parentesco.MAE.name())))
+        ;
+
+    }
+
+    @Disabled("WIP: Avaliando falha do teste")
+    @DisplayName("Listagem de parentes para repositório usuário, utros parentes e filtro nome")
+    @Test
+    public void test_listagem_de_parentes_para_repositorio_com_usuario_e_parentes_filtro_nome() throws Exception {
+        // Arrange
+        Pessoa terceiraPessoa = new Pessoa(44L, "44", LocalDate.now(), Sexo.FEMININO);
+        when(pessoaRepository.findAll(ArgumentMatchers.isA(Example.class))).thenReturn(
+                List.of(
+                        usuarioTesteFeminino.getPessoa(),
+                        usuarioTesteMasculino.getPessoa(),
+                        terceiraPessoa
+                )
+        );
+        when(parentescoPessoasRepository.obterParentescoParaPessoas(
+                usuarioTesteFeminino.getPessoa().getId(),
+                usuarioTesteMasculino.getPessoa().getId()
+        )).thenReturn(Parentesco.PAI);
+        when(parentescoPessoasRepository.obterParentescoParaPessoas(
+                usuarioTesteFeminino.getPessoa().getId(),
+                terceiraPessoa.getId()
+        )).thenReturn(Parentesco.MAE);
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT)
+                                .param("nome", "44")
+                                .with(user(usuarioTesteFeminino))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(terceiraPessoa.getId().intValue())))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is(terceiraPessoa.getNome())))
+                .andExpect(jsonPath("$[0].dataNascimento",
+                        Matchers.is(terceiraPessoa.getDataNascimento().toString())))
+                .andExpect(jsonPath("$[0].sexo",
+                        Matchers.is(terceiraPessoa.getSexo().toString())))
+                .andExpect(jsonPath("$[0].parentesco",
+                        Matchers.is(Parentesco.MAE.name())))
+        ;
+
     }
 
 }

@@ -17,6 +17,6 @@ public record PessoaComParentescoDTO(
 ) {
     public PessoaComParentescoDTO(Pessoa pessoa, Parentesco parentesco) {
         this(pessoa.getId(), pessoa.getNome(), pessoa.getDataNascimento(),
-                pessoa.getSexo().name(), parentesco.name());
+                pessoa.getSexo().name(), parentesco != null ? parentesco.name() : "");
     }
 }
