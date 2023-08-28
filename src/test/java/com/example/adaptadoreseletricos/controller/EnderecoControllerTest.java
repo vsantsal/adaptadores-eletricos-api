@@ -388,4 +388,36 @@ class EnderecoControllerTest {
 
     }
 
+    @DisplayName("Listagem de endereços para repositório vazio")
+    @Test
+    public void test_listagem_de_enderecos_para_repositorio_vazio() throws Exception {
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(0)));
+    }
+
+    @DisplayName("Listagem de endereços para repositório sem endereço associado ao usuário logado")
+    @Test
+    public void test_listagem_de_enderecos_para_repositorio_sem_endereco_associado_ao_usuario_logado() throws Exception {
+        // Arrange
+        enderecoRepository.save(enderecoPadrao);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(outraPessoa, enderecoPadrao)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(0)));
+    }
+
 }

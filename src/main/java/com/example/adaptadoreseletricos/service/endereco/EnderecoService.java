@@ -11,8 +11,11 @@ import com.example.adaptadoreseletricos.dto.endereco.EnderecoDetalheDTO;
 import com.example.adaptadoreseletricos.service.pessoa.RegistroUsuarioService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class EnderecoService {
@@ -88,6 +91,23 @@ public class EnderecoService {
 
         enderecoRepository.save(enderecoAAtualizar);
         return new EnderecoDetalheDTO(enderecoAAtualizar);
+
+    }
+
+    public List<EnderecoDetalheDTO> listar(EnderecoCadastroDTO paramPesquisa) {
+        // entidades envolvidas na requisição
+        var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
+        Endereco enderecoPesquisado = paramPesquisa.toEndereco();
+        Example<Endereco> exemplo = Example.of(enderecoPesquisado);
+        List<Endereco> enderecos = enderecoRepository.findAll(exemplo);
+        return enderecos
+                .stream()
+                .filter(e -> enderecosPessoasRepository.existsById(
+                            new EnderecosPessoasChave(pessoaLogada, e)
+                        )
+                )
+                .map(EnderecoDetalheDTO::new)
+                .toList();
 
     }
 }
