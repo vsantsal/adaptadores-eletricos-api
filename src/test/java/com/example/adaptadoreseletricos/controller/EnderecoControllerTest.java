@@ -300,4 +300,24 @@ class EnderecoControllerTest {
         assertFalse(estahNaBase);
     }
 
+    @DisplayName("Teste de remoção de endereço não associado ao usuário retorna status 404")
+    @Test
+    public void test_remocao_de_endereco_associado_ao_usuario_retorna_status_404() throws Exception {
+        // Arrange
+        enderecoRepository.save(enderecoPadrao);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(outraPessoa, enderecoPadrao)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        delete(ENDPOINT + "/1")
+                                .with(user(usuario))
+                )
+
+                // Assert
+                .andExpect(status().isNotFound());
+
+    }
+
 }

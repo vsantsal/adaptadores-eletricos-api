@@ -8,6 +8,7 @@ import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecosPess
 import com.example.adaptadoreseletricos.dto.endereco.EnderecoCadastroDTO;
 import com.example.adaptadoreseletricos.dto.endereco.EnderecoDetalheDTO;
 import com.example.adaptadoreseletricos.service.pessoa.RegistroUsuarioService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,14 +45,22 @@ public class EnderecoService {
 
     @Transactional
     public void excluir(Long id) {
+        // Entidades envolvidas na tentativa de exclusão
         var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         var enderecoAExcluir = enderecoRepository.getReferenceById(id);
-        this.enderecosPessoasRepository.deleteById(
-                new EnderecosPessoasChave(
-                        pessoaLogada,
-                        enderecoAExcluir
-                )
+        var chaveAssociacao = new EnderecosPessoasChave(
+                pessoaLogada,
+                enderecoAExcluir
         );
-        this.enderecoRepository.delete(enderecoAExcluir);
+        boolean enderecoDaPessoaLogada = enderecosPessoasRepository.existsById(chaveAssociacao);
+
+        // Execução de procedimentos dependendo se endereço está associado ou não
+        // Ao usuário logado na aplicação
+        if (enderecoDaPessoaLogada) {
+            this.enderecosPessoasRepository.deleteById(chaveAssociacao);
+            this.enderecoRepository.delete(enderecoAExcluir);
+        } else {
+            throw new EntityNotFoundException("Endereço e usuário não associados");
+        }
     }
 }
