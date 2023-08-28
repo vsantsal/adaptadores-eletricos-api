@@ -1,6 +1,7 @@
 package com.example.adaptadoreseletricos.controller;
 
 import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
+import com.example.adaptadoreseletricos.domain.entity.endereco.EnderecosPessoas;
 import com.example.adaptadoreseletricos.domain.entity.endereco.EnderecosPessoasChave;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
@@ -61,9 +62,26 @@ class EnderecoControllerTest {
                     Sexo.FEMININO)
     );
 
+    private final Pessoa outraPessoa = new Pessoa(
+            2L,
+            "Usuario Testado",
+            LocalDate.of(1961, 2, 28),
+            Sexo.MASCULINO
+    );
+
+    private  final Endereco enderecoPadrao = new Endereco(
+                    1L,
+                    "Rua Nascimento Silva",
+                    107L,
+                    "Ipanema",
+                    "Rio de Janeiro",
+                    Estado.RJ);
+
     @BeforeEach
     public void setUp(){
+
         pessoaRepository.save(usuario.getPessoa());
+        pessoaRepository.save(outraPessoa);
     }
 
     @AfterEach
@@ -147,16 +165,7 @@ class EnderecoControllerTest {
     @Test
     public void test_deve_detalhar_endereco_para_id_valido() throws Exception {
         // Arrange
-        enderecoRepository.save(
-                new Endereco(
-                        1L,
-                        "Rua Nascimento Silva",
-                        107L,
-                        "Ipanema",
-                        "Rio de Janeiro",
-                        Estado.RJ
-                )
-        );
+        enderecoRepository.save(enderecoPadrao);
 
         // Act
         this.mockMvc.perform(get(ENDPOINT + "/1")
@@ -249,6 +258,46 @@ class EnderecoControllerTest {
                 )
                 // Assert
                 .andExpect(status().is4xxClientError());
+    }
+
+    @DisplayName("Teste de remoção de endereço associado ao usuário retorna status 204")
+    @Test
+    public void test_remocao_de_endereco_associado_ao_usuario_retorna_status_204() throws Exception {
+        // Arrange
+        enderecoRepository.save(enderecoPadrao);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        delete(ENDPOINT + "/1")
+                                .with(user(usuario))
+                )
+
+                // Assert
+                .andExpect(status().isNoContent());
+
+    }
+
+    @DisplayName("Teste de remoção de endereço associado ao usuário apaga registros pertinentes")
+    @Test
+    public void test_remocao_de_endereco_associado_ao_usuario_apaga_registros_pertinentes() throws Exception {
+        // Arrange
+        enderecoRepository.save(enderecoPadrao);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        delete(ENDPOINT + "/1")
+                                .with(user(usuario))
+                );
+
+        // Assert
+        boolean estahNaBase = enderecoRepository.existsById(1L);
+        assertFalse(estahNaBase);
     }
 
 }

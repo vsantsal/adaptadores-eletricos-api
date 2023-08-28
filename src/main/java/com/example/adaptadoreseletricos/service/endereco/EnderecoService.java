@@ -2,7 +2,7 @@ package com.example.adaptadoreseletricos.service.endereco;
 
 import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
 import com.example.adaptadoreseletricos.domain.entity.endereco.EnderecosPessoas;
-import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
+import com.example.adaptadoreseletricos.domain.entity.endereco.EnderecosPessoasChave;
 import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecoRepository;
 import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecosPessoasRepository;
 import com.example.adaptadoreseletricos.dto.endereco.EnderecoCadastroDTO;
@@ -29,9 +29,9 @@ public class EnderecoService {
         Endereco enderecoSalvo = this.enderecoRepository.save(enderecoASalvar);
 
         // Salva associação de endereço cadastrado ao usuário logado
-        Pessoa pessoa = RegistroUsuarioService.getPessoaLogada();
+        var pessoaLogada =  RegistroUsuarioService.getPessoaLogada();
         this.enderecosPessoasRepository.save(
-                new EnderecosPessoas(pessoa, enderecoSalvo)
+                new EnderecosPessoas(pessoaLogada, enderecoSalvo)
         );
 
         return new EnderecoDetalheDTO(enderecoSalvo);
@@ -40,5 +40,18 @@ public class EnderecoService {
     public EnderecoDetalheDTO detalhar(Long id) {
         Endereco endereco = enderecoRepository.getReferenceById(id);
         return new EnderecoDetalheDTO(endereco);
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+        var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
+        var enderecoAExcluir = enderecoRepository.getReferenceById(id);
+        this.enderecosPessoasRepository.deleteById(
+                new EnderecosPessoasChave(
+                        pessoaLogada,
+                        enderecoAExcluir
+                )
+        );
+        this.enderecoRepository.delete(enderecoAExcluir);
     }
 }
