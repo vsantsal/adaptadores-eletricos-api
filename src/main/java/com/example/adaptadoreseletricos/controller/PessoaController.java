@@ -2,7 +2,6 @@ package com.example.adaptadoreseletricos.controller;
 
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaCadastroDTO;
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaComParentescoDTO;
-import com.example.adaptadoreseletricos.dto.pessoa.PessoaDetalheDTO;
 import com.example.adaptadoreseletricos.service.pessoa.PessoaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
