@@ -320,4 +320,72 @@ class EnderecoControllerTest {
 
     }
 
+    @DisplayName("Deve atualizar com sucesso todas as informações para endereço associado ao usuário")
+    @Test
+    public void test_atualizacao_valida() throws Exception {
+        // Arrange
+        enderecoRepository.save(enderecoPadrao);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+
+        // Act
+        // Act
+        this.mockMvc.perform(
+                put( ENDPOINT + "/1")
+                        .with(user(usuario))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                "{\"rua\": \"Avenida Lins de Vasconcelos\", " +
+                                        "\"numero\": 1264, " +
+                                        "\"bairro\": \"Cambuci\", " +
+                                        "\"cidade\": \"São Paulo\", " +
+                                        "\"estado\": \"SP\"}"
+                        )
+        )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$.rua",
+                        Matchers.is("Avenida Lins de Vasconcelos")))
+                .andExpect(jsonPath("$.numero",
+                        Matchers.is(1264)))
+                .andExpect(jsonPath("$.bairro",
+                        Matchers.is("Cambuci")))
+                .andExpect(jsonPath("$.cidade",
+                        Matchers.is("São Paulo")))
+                .andExpect(jsonPath("$.estado",
+                        Matchers.is("SP")))
+        ;
+
+    }
+
+    @DisplayName("Não pode atualizar com sucesso todas as informações para endereço associado ao usuário")
+    @Test
+    public void test_atualizacao_invalida() throws Exception {
+        // Arrange
+        enderecoRepository.save(enderecoPadrao);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(outraPessoa, enderecoPadrao)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        put( ENDPOINT + "/1")
+                                .with(user(usuario))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"rua\": \"Avenida Lins de Vasconcelos\", " +
+                                                "\"numero\": 1264, " +
+                                                "\"bairro\": \"Cambuci\", " +
+                                                "\"cidade\": \"São Paulo\", " +
+                                                "\"estado\": \"SP\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isNotFound());
+
+    }
+
 }

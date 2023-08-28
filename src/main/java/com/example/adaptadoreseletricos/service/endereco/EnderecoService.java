@@ -3,6 +3,7 @@ package com.example.adaptadoreseletricos.service.endereco;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
 import com.example.adaptadoreseletricos.domain.entity.endereco.EnderecosPessoas;
 import com.example.adaptadoreseletricos.domain.entity.endereco.EnderecosPessoasChave;
+import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
 import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecoRepository;
 import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecosPessoasRepository;
 import com.example.adaptadoreseletricos.dto.endereco.EnderecoCadastroDTO;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class EnderecoService {
 
+    private final String MENSAGEM_ERRO_NAO_ASSOCIACAO = "Endereço e usuário não associados";
     @Autowired
     private EnderecoRepository enderecoRepository;
 
@@ -60,7 +62,32 @@ public class EnderecoService {
             this.enderecosPessoasRepository.deleteById(chaveAssociacao);
             this.enderecoRepository.delete(enderecoAExcluir);
         } else {
-            throw new EntityNotFoundException("Endereço e usuário não associados");
+            throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
         }
+    }
+
+    @Transactional
+    public EnderecoDetalheDTO atualizar(Long id, EnderecoCadastroDTO dto) {
+        // Entidades envolvidas na transação
+        Endereco enderecoAAtualizar = enderecoRepository.getReferenceById(id);
+        var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
+
+        // Se não há associação, não permitir atualização
+        if (!enderecosPessoasRepository.existsById(
+                new EnderecosPessoasChave(pessoaLogada, enderecoAAtualizar)
+        )){
+            throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
+        }
+
+        // Atualiza dados do endereço
+        enderecoAAtualizar.setBairro(dto.bairro());
+        enderecoAAtualizar.setRua(dto.rua());
+        enderecoAAtualizar.setCidade(dto.cidade());
+        enderecoAAtualizar.setNumero(dto.numero());
+        enderecoAAtualizar.setEstado(Estado.valueOf(dto.estado()));
+
+        enderecoRepository.save(enderecoAAtualizar);
+        return new EnderecoDetalheDTO(enderecoAAtualizar);
+
     }
 }

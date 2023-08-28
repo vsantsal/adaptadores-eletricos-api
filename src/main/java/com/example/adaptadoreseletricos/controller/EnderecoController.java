@@ -33,6 +33,15 @@ public class EnderecoController {
         return ResponseEntity.ok(dto);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid EnderecoCadastroDTO dto
+    ){
+        var dtoResposta = this.service.atualizar(id, dto);
+        return ResponseEntity.ok(dtoResposta);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity excluir(@PathVariable Long id){
         this.service.excluir(id);
