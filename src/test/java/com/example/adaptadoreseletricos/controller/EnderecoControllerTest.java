@@ -1,6 +1,7 @@
 package com.example.adaptadoreseletricos.controller;
 
 import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
+import com.example.adaptadoreseletricos.domain.entity.endereco.EnderecosPessoasChave;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Sexo;
@@ -23,12 +24,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -93,6 +93,34 @@ class EnderecoControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andExpect(header().string("Location", containsString("enderecos/1")));
+    }
+
+    @DisplayName("Teste de associação de endereço cadastrado com usuario logado")
+    @Test
+    public void test_deve_associar_endereco_a_usuario_logado() throws Exception {
+        // Act
+        this.mockMvc.perform(
+                        post(ENDPOINT)
+                                .with(user(usuario))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"rua\": \"Rua Nascimento Silva\", " +
+                                                "\"numero\": 107, " +
+                                                "\"bairro\": \"Ipanema\", " +
+                                                "\"cidade\": \"Rio de Janeiro\", " +
+                                                "\"estado\": \"RJ\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isCreated());
+
+        Endereco enderecoCadastrado = enderecoRepository.getReferenceById(1L);
+        boolean houveAssociacao = enderecosPessoasRepository.existsById(
+                new EnderecosPessoasChave(
+                        usuario.getPessoa(),
+                        enderecoCadastrado)
+        );
+        assertTrue(houveAssociacao);
     }
 
     @DisplayName("Teste de inclusão de endereço com estado inválido")
