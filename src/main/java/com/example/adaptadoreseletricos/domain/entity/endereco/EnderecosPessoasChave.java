@@ -12,11 +12,11 @@ import java.io.Serializable;
 public class EnderecosPessoasChave implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_pessoa", nullable = false, insertable = false, updatable = false)
-    Pessoa pessoa;
+    private Pessoa pessoa;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_endereco", nullable = false, insertable = false, updatable = false)
-    Endereco endereco;
+    private Endereco endereco;
 
     public EnderecosPessoasChave(Pessoa pessoa, Endereco endereco) {
         this.pessoa = pessoa;
