@@ -20,6 +20,7 @@ public class ParentescoPessoasChave implements Serializable {
         this.pessoa2 = pessoa2;
     }
 
+    @Deprecated
     public ParentescoPessoasChave(){
 
     }
