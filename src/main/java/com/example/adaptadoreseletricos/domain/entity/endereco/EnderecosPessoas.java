@@ -36,4 +36,9 @@ public class EnderecosPessoas {
         this.ativo = true;
         this.dataAtualizacao = LocalDate.now();
     }
+
+    public void desativar() {
+        this.ativo = false;
+        this.dataAtualizacao = LocalDate.now();
+    }
 }
