@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -122,11 +123,28 @@ class PessoaControllerTest {
     }
 
     @DisplayName("Teste de detalhamento de pessoa para id válido na API")
-    @WithMockUser(username = "tester")
     @Test
     public void test_deve_detalhar_pessoa_para_id_valido() throws Exception {
+        // Arrange
+        parentescoPessoasRepository.save(
+          new ParentescoPessoas(
+                  usuarioTesteMasculino.getPessoa(),
+                  terceiraPessoa,
+                  Parentesco.IRMA
+          )
+        );
+        parentescoPessoasRepository.save(
+                new ParentescoPessoas(
+                        terceiraPessoa,
+                        usuarioTesteMasculino.getPessoa(),
+                        Parentesco.IRMAO
+                )
+        );
         // Act
-        this.mockMvc.perform(get(ENDPOINT +"/1"))
+        this.mockMvc.perform(
+                get(ENDPOINT +"/1")
+                        .with(user(usuarioTesteMasculino))
+                )
                 // Assert
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id",
@@ -139,12 +157,28 @@ class PessoaControllerTest {
                         Matchers.is("FEMININO")));
     }
 
+    @DisplayName("Teste de detalhamento de pessoa para id válido sem parentesco na API")
+    @Test
+    public void test_nao_deve_detalhar_pessoa_para_id_valido_sem_parentesco() throws Exception {
+        // Act
+        this.mockMvc.perform(
+                get(ENDPOINT + "/2")
+                        .with(user(usuarioTesteMasculino))
+                )
+
+                // Assert
+                .andExpect(status().isNotFound());
+
+    }
+
     @DisplayName("Teste de detalhamento de pessoa para Id inexistente na API")
-    @WithMockUser(username = "tester")
     @Test
     public void test_nao_deve_detalhar_pessoa_para_id_invalido() throws Exception {
         // Act
-        this.mockMvc.perform(get(ENDPOINT + "/1000"))
+        this.mockMvc.perform(
+                get(ENDPOINT + "/1000")
+                        .with(user(usuarioTesteFeminino))
+                )
 
                 // Assert
                 .andExpect(status().isNotFound());
