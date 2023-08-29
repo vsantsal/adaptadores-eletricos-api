@@ -2,26 +2,31 @@ package com.example.adaptadoreseletricos.controller;
 
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.Eletrodomestico;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
+import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
+import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
+import com.example.adaptadoreseletricos.domain.entity.pessoa.Sexo;
+import com.example.adaptadoreseletricos.domain.entity.pessoa.Usuario;
 import com.example.adaptadoreseletricos.domain.repository.eletrodomestico.EletrodomesticoRepository;
+import com.example.adaptadoreseletricos.domain.repository.eletrodomestico.EletrodomesticosPessoasRepository;
+import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecoRepository;
 import com.example.adaptadoreseletricos.service.eletrodomestico.EletrodomesticoService;
 import jakarta.persistence.EntityNotFoundException;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
+
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -30,45 +35,79 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("test")
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @AutoConfigureMockMvc
 class EletrodomesticoControllerTest {
 
-    private String endpoint = "/eletrodomesticos";
+    private String ENDPOINT = "/eletrodomesticos";
 
     @Autowired
     private MockMvc mockMvc;
 
-    @SpyBean
+    @Autowired
     private EletrodomesticoService service;
 
-    @MockBean
-    private EletrodomesticoRepository repository;
+    @Autowired
+    private EletrodomesticoRepository eletrodomesticoRepository;
+
+    @Autowired
+    private EletrodomesticosPessoasRepository eletrodomesticosPessoasRepository;
+
+    @Autowired
+    private EnderecoRepository enderecoRepository;
+
+    private final Usuario usuario = new Usuario(
+            "usuarioTester",
+            "usuarioTester",
+            new Pessoa(1L,
+                    "Usuario Tester",
+                    LocalDate.of(1961, 12, 31),
+                    Sexo.MASCULINO)
+    );
+
+    private  final Endereco enderecoPadrao = new Endereco(
+            1L,
+            "Rua Nascimento Silva",
+            107L,
+            "Ipanema",
+            "Rio de Janeiro",
+            Estado.RJ);
+
+    private final Eletrodomestico eletrodomesticoPadrao = new Eletrodomestico(
+            1L,
+            "Aparelho de som",
+            "XPTO",
+            "ABC",
+            200L,
+            enderecoPadrao
+    );
+
+    @BeforeEach
+    public void setUp(){
+        enderecoRepository.save(enderecoPadrao);
+    }
+
+    @AfterEach
+    public void tearDown(){
+        eletrodomesticosPessoasRepository.deleteAll();
+        eletrodomesticoRepository.deleteAll();
+        enderecoRepository.deleteAll();
+
+    }
 
     @DisplayName("Teste de cadastro de eletrodomestico válido na API")
-    @WithMockUser(username = "tester")
     @Test
     public void test_deve_criar_eletrodomestico_se_dados_informados_validos() throws Exception {
-        // Arrange
-        when(repository.save(any(Eletrodomestico.class))).thenReturn(
-                new Eletrodomestico(
-                        1L,
-                        "Aparelho de som",
-                        "XPTO",
-                        "ABC",
-                        200L,
-                        new Endereco()
-                )
-        );
-
         // Act
         this.mockMvc.perform(
-                        post(endpoint)
-                                .with(csrf())
+                        post(ENDPOINT)
+                                .with(user(usuario))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         "{\"nome\": \"Aparelho de som\", " +
                                                 "\"modelo\": \"XPTO\", " +
                                                 "\"marca\": \"ABC\", " +
+                                                "\"idEndereco\": 1, " +
                                                 "\"potencia\": 200}"
                                 )
                 )
@@ -79,18 +118,18 @@ class EletrodomesticoControllerTest {
     }
 
     @DisplayName("Teste de erro ao cadastrar eletrodoméstico com potência negativa")
-    @WithMockUser(username = "tester")
     @Test
     public void test_deve_informar_erro_requisicao_cliente_se_potencia_negativa() throws Exception{
         // Arrange/Act
         this.mockMvc.perform(
-                post(endpoint)
-                        .with(csrf())
+                post(ENDPOINT)
+                        .with(user(usuario))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 "{\"nome\": \"Aparelho de som\", " +
                                         "\"modelo\": \"XPTO\", " +
                                         "\"marca\": \"ABC\", " +
+                                        "\"idEndereco\": 1, " +
                                         "\"potencia\": -1}"
                         )
                 )
@@ -99,18 +138,18 @@ class EletrodomesticoControllerTest {
     }
 
     @DisplayName("Teste de erro ao cadastrar eletrodoméstico com nome com mais de 120 caracteres")
-    @WithMockUser(username = "tester")
     @Test
     public void test_deve_informar_erro_requisicao_cliente_se_nome_muito_comprido() throws Exception{
         // Arrange/Act
         this.mockMvc.perform(
-                        post(endpoint)
-                                .with(csrf())
+                        post(ENDPOINT)
+                                .with(user(usuario))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         "{\"nome\": \" " + "a".repeat(121) + "\", " +
                                                 "\"modelo\": \"XPTO\", " +
                                                 "\"marca\": \"ABC\", " +
+                                                "\"idEndereco\": 1, " +
                                                 "\"potencia\": 1}"
                                 )
                 )
@@ -118,31 +157,20 @@ class EletrodomesticoControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
+
     @DisplayName("Teste de cadastro de eletrodomestico se modelo possui quantidade maxima de caracteres")
-    @WithMockUser(username = "tester")
     @Test
     public void test_deve_criar_eletrodomestico_se_quantidade_maxima_de_modelo_eh_respeitada() throws Exception {
-        // Arrange
-        when(repository.save(any(Eletrodomestico.class))).thenReturn(
-                new Eletrodomestico(
-                        1L,
-                        "b".repeat(120),
-                        "XPTO",
-                        "ABC",
-                        200L,
-                        new Endereco()
-                )
-        );
-
         // Act
         this.mockMvc.perform(
-                        post(endpoint)
-                                .with(csrf())
+                        post(ENDPOINT)
+                                .with(user(usuario))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         "{\"nome\": \"" + "b".repeat(120) + "\", " +
                                                 "\"modelo\": \"XPTO\", " +
                                                 "\"marca\": \"ABC\", " +
+                                                "\"idEndereco\": 1, " +
                                                 "\"potencia\": 200}"
                                 )
                 )
@@ -153,23 +181,13 @@ class EletrodomesticoControllerTest {
     }
 
     @DisplayName("Teste de detalhamento de eletrodoméstico para id válido na API")
-    @WithMockUser(username = "tester")
     @Test
     public void test_deve_detalhar_eletrodomestico_para_id_valido() throws Exception {
         // Arrange
-        when(repository.getReferenceById(1L)).thenReturn(
-                new Eletrodomestico(
-                        1L,
-                        "Aparelho de som",
-                        "XPTO",
-                        "ABC",
-                        200L,
-                        new Endereco()
-                )
-        );
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
         // Act
-        this.mockMvc.perform(get(endpoint + "/1")
-                .with(csrf()))
+        this.mockMvc.perform(get(ENDPOINT + "/1")
+                .with(user(usuario)))
                 // Assert
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id",
@@ -186,17 +204,11 @@ class EletrodomesticoControllerTest {
     }
 
     @DisplayName("Teste de detalhamento de eletrodoméstico para id inexistente na API")
-    @WithMockUser(username = "tester")
     @Test
     public void test_nao_deve_detalhar_eletrodomestico_para_id_invalido() throws Exception {
-        // Arrange
-        when(repository.getReferenceById(2L)).thenThrow(
-                EntityNotFoundException.class
-        );
-
         // Act
-        this.mockMvc.perform(get(endpoint + "/2")
-                        .with(csrf()))
+        this.mockMvc.perform(get(ENDPOINT + "/1")
+                .with(user(usuario)))
 
                 // Assert
                 .andExpect(status().isNotFound());
