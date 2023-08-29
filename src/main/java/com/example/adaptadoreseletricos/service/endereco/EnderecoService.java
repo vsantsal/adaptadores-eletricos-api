@@ -48,7 +48,7 @@ public class EnderecoService {
         var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         Endereco endereco = enderecoRepository.getReferenceById(id);
 
-        if (enderecosPessoasRepository.existsById(
+        if (enderecosPessoasRepository.existsByIdAtivoTrue(
                 new EnderecosPessoasChave(
                         pessoaLogada,
                         endereco
