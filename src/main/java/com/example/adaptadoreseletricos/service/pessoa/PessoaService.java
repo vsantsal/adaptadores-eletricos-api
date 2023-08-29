@@ -9,7 +9,6 @@ import com.example.adaptadoreseletricos.dto.pessoa.PessoaDetalheDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +16,8 @@ import java.util.List;
 
 @Service
 public class PessoaService {
+
+    private final String MENSAGEM_ERRO_NAO_ASSOCIACAO = "Pessoas não associadas";
 
     @Autowired
     private PessoaRepository pessoaRepository;
@@ -37,7 +38,7 @@ public class PessoaService {
         // Salva pessoa informada pelo usuário logado
         Pessoa pessoaASalvar = dto.toPessoa();
         Pessoa pessoaSalva = this.pessoaRepository.save(pessoaASalvar);
-        Pessoa pessoaLogada = getPessoaLogada();
+        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         // Salva relacionamentos de parentesco, caso tenha sido informado
         if (dto.parentesco() != null) {
             Parentesco parentesco = Parentesco.valueOf(dto.parentesco());
@@ -61,27 +62,53 @@ public class PessoaService {
     }
 
     public PessoaDetalheDTO detalhar(Long id) {
+        // Entidades envolvidas na requisição
+        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         Pessoa pessoa = pessoaRepository.getReferenceById(id);
-        return new PessoaDetalheDTO(pessoa);
+        if (parentescoPessoasRepository.existsById(
+                new ParentescoPessoasChave(pessoaLogada, pessoa)
+        )){
+            return new PessoaDetalheDTO(pessoa);
+        }
+        throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
     }
 
     @Transactional
     public void excluir(Long id) {
+        // Entidades envolvidas na transação
+        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
+        Pessoa pessoaAExcluir = pessoaRepository.getReferenceById(id);
+
+        if (!parentescoPessoasRepository.existsById(
+                new ParentescoPessoasChave(pessoaLogada, pessoaAExcluir)
+        )){
+            throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
+        }
+
         this.parentescoPessoasRepository
                 .removerTodosParentescosDePessoa(id);
         this.pessoaRepository.deleteById(id);
+
     }
 
     @Transactional
     public PessoaComParentescoDTO atualizar(Long id, PessoaCadastroDTO dto) {
-        // Atualiza dados da pessoa
+        // Entidades envolvidas na transação
+        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         Pessoa pessoaAAtualizar = pessoaRepository.getReferenceById(id);
+
+        if (!parentescoPessoasRepository.existsById(
+                new ParentescoPessoasChave(pessoaLogada, pessoaAAtualizar)
+        )){
+            throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
+        }
+
+        // Atualiza dados da pessoa
         pessoaAAtualizar.setNome(dto.nome());
         pessoaAAtualizar.setSexo(Sexo.valueOf(dto.sexo()));
         pessoaAAtualizar.setDataNascimento(dto.dataNascimento());
 
         // Atualiza parentesco com usuário
-        Pessoa pessoaLogada = getPessoaLogada();
         Parentesco novoParentesco = Parentesco.valueOf(dto.parentesco());
         Parentesco novoInversoDeParentesco = novoParentesco.getInversaoDeParentesco(
                 pessoaLogada.getSexo()
@@ -105,7 +132,7 @@ public class PessoaService {
     }
 
     public List<PessoaComParentescoDTO> listar(PessoaCadastroDTO paramPesquisa) {
-        Pessoa pessoaLogada = getPessoaLogada();
+        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         Pessoa pessoa = paramPesquisa.toPessoa();
         Parentesco parentescoPesquisa = paramPesquisa.parentesco() != null ? Parentesco.valueOf(paramPesquisa.parentesco()): null;
         Example<Pessoa> exemplo = Example.of(pessoa);
@@ -134,9 +161,5 @@ public class PessoaService {
                 ).toList();
     }
 
-    private Pessoa getPessoaLogada(){
-        var usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return usuario.getPessoa();
-    }
 
 }

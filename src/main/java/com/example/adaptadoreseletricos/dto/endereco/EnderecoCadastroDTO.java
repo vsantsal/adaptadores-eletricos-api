@@ -25,7 +25,9 @@ public record EnderecoCadastroDTO(
         endereco.setNumero(numero());
         endereco.setBairro(bairro());
         endereco.setCidade(cidade());
-        endereco.setEstado(Estado.valueOf(estado()));
+        if (estado() != null) {
+            endereco.setEstado(Estado.valueOf(estado()));
+        }
         return endereco;
     }
 }

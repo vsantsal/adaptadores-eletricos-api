@@ -108,9 +108,45 @@ Para o POST, o *body* de cada requisição deve informar JSON no seguinte format
 }
 ```
 
-Em caso de sucesso, a aplicação deve informar a *location* do recurso criado.
+Em caso de sucesso, a aplicação deve informar a *location* do recurso criado. O endereço cadastrado automaticamente estará associado ao usuário logado.
 
 Se falha nos dados passados pelos clientes, deve informar o erro.
+
+Por exemplo, caso cliente passe número de rua negativo, o sistema devolverá:
+
+```json
+[
+    {
+        "campo": "numero",
+        "mensagem": "número de rua deve ser positivo"
+    }
+]
+```
+
+Para o DELETE, deve-se passar o id do endereço a remover no endpoint (por exemplo, `enderecos/73`). A aplicação marcará a associação entre usuário e o endereço como inativa e retornará o STATUS CODE 204. Um usuário logado somente poderá excluir endereços em que residam.
+
+Para o UPDATE, deve-se passar  o id do endereco a atualizar no endpoint (por exemplo, `enderecos/73`) e os novos valores para os campos no corpo da requisição, conforme abaixo:
+
+```json 
+{
+  "rua": "Rua Nascimento Silva",
+  "numero": 207,
+  "bairro": "Ipanema",
+  "cidade": "Rio de Janeiro",
+  "estado": "RJ"
+}
+```
+
+A aplicação fará as atualizações dos campos e retornará o STATUS CODE 200, em caso de sucesso. 
+
+Um usuário logado somente poderá atualizar endereços em que residam.
+
+O GET no endpoint pode ser realizado complementando com ID ou não.
+
+Se ID for informado, retornará o endereço buscado.
+
+Sem ID, todos endereços associados ao usuário serão listado. Pode-se ainda pesquisar pelos campos `rua`, `numero`, `bairro`, `cidade` e `estado`.
+
 
 ## API de Cadastro de Eletrodomésticos
 
@@ -164,7 +200,7 @@ Por exemplo, caso cliente passe sexo e parentesco de pessoas incoerentes, a apli
 }
 ```
 
-Para o DELETE, deve-se passar o id da pessoa a remover no endpoint (por exemplo, `pessoas/42`). A aplicação promoverá a exclusão e retornar o STATUS CODE 204.
+Para o DELETE, deve-se passar o id da pessoa a remover no endpoint (por exemplo, `pessoas/42`). A aplicação promoverá a exclusão e retornar o STATUS CODE 204. Um usuário logado somente poderá excluir pessoa com a qual possua parentesco.
 
 Para o UPDATE, deve-se passar  o id da pessoa a atualizar no endpoint (por exemplo, `pessoas/42`) e os novos valores para os campos no corpo da requisição, conforme abaixo:
 
@@ -177,7 +213,7 @@ Para o UPDATE, deve-se passar  o id da pessoa a atualizar no endpoint (por exemp
 }
 ```
 
-A aplicação fará as atualizações dos campos e retornará o STATUS CODE 200, em caso de sucesso.
+A aplicação fará as atualizações dos campos e retornará o STATUS CODE 200, em caso de sucesso. Um usuário logado somente poderá atualizar pessoa com a qual possua parentesco.
 
 O GET no endpoint pode ser realizado complementando com ID ou não.
 
@@ -202,8 +238,9 @@ Sem ID, todas as pessoas com parentesco serão apresentadas. Pode-se utilizar ai
 
 * Implementação (entre a primeira e a segunda) de métrica de cobertura de código pelos testes, com habilitação do *github-actions bot* para gerar *badge*;
 * Para cadastro de usuários e login na aplicação, adicionamos dependências [*Spring Security*](https://spring.io/projects/spring-security) e [*auth0/java-jwt*](https://github.com/auth0/java-jwt), baseados principalmente no curso [Spring Boot 3: aplique boas práticas e proteja uma API Rest](https://www.alura.com.br/curso-online-spring-boot-aplique-boas-praticas-proteja-api-rest) da Alura e no tutorial [Autenticação e Autorização com Spring Security e JWT Tokens](https://www.youtube.com/watch?v=5w-YCcOjPD0), de Fernanda Kipper;
-* Naturalmente, foi necessário atualizar os testes para considerar a nova dependência de segurança do projeto, por meio de anotações `@WithMockUser`, `@ActiveProfiles`, `@SpringBootTest`, `@AutoConfigureMockMvc`, além do método `.with(csrf())`;
+* Naturalmente, foi necessário atualizar os testes para considerar a nova dependência de segurança do projeto, por meio de anotações `@ActiveProfiles`, `@SpringBootTest`, `@AutoConfigureMockMvc`, além do método `.with(user())`;
 * Adicionamos dependência `h2` para execução dos testes no *Github Actions*;
 * Para criarmos o relacionamento de parentes entre pessoas, do tipo M:N, nos baseamos fortemente neste [tutorial do Baldeung](https://www.baeldung.com/jpa-many-to-many);
 * Para criarmos *custom queries* que atualizassem a base no repositório da entidade associativa ParentescoPessoas, consultamos este [tutorial do Baldeung](https://www.baeldung.com/spring-data-jpa-modifying-annotation);
 * Haja vista a criação de consultas personalizadas, fizemos também teste de repositório para validar nossa implementação;
+* Retiramos uso de *mocks* para *repositories* - para garantir corretos *set up* e *tear down* entre execuções, adicionamos a *annotation* `@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)` às classes de controllers e repositories; 
