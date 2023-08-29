@@ -44,8 +44,20 @@ public class EnderecoService {
     }
 
     public EnderecoDetalheDTO detalhar(Long id) {
+        // entidades envolvidas na transação
+        var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         Endereco endereco = enderecoRepository.getReferenceById(id);
-        return new EnderecoDetalheDTO(endereco);
+
+        if (enderecosPessoasRepository.existsById(
+                new EnderecosPessoasChave(
+                        pessoaLogada,
+                        endereco
+                ))){
+            return new EnderecoDetalheDTO(endereco);
+        }
+
+        throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
+
     }
 
     @Transactional

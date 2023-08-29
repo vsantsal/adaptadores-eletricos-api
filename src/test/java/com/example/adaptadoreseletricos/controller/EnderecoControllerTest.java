@@ -161,11 +161,14 @@ class EnderecoControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
-    @DisplayName("Teste de detalhamento de endereço para id válido na API")
+    @DisplayName("Teste de detalhamento de endereço para id válido na API associado ao usuario")
     @Test
-    public void test_deve_detalhar_endereco_para_id_valido() throws Exception {
+    public void test_deve_detalhar_endereco_para_id_valido_associado() throws Exception {
         // Arrange
         enderecoRepository.save(enderecoPadrao);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
 
         // Act
         this.mockMvc.perform(get(ENDPOINT + "/1")
@@ -186,6 +189,30 @@ class EnderecoControllerTest {
                         Matchers.is("RJ")));
     }
 
+    @DisplayName("Teste de detalhamento de endereço para id válido na API não associado ao usuario")
+    @Test
+    public void test_nao_deve_detalhar_endereco_para_id_valido_nao_associado() throws Exception {
+        // Arrange
+        Endereco novoEndereco = new Endereco(
+                2L,
+                "Avenida Lins de Vasconcelos",
+                1264L,
+                "Cambuci",
+                "São Paulo",
+                Estado.SP
+        );
+        enderecoRepository.save(enderecoPadrao);
+        enderecoRepository.save(novoEndereco);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+
+        // Act
+        this.mockMvc.perform(get(ENDPOINT + "/2")
+                        .with(user(usuario)))
+                // Assert
+                .andExpect(status().isNotFound());
+    }
 
     @DisplayName("Teste de detalhamento de endereco para Id inexistente na API")
     @Test
