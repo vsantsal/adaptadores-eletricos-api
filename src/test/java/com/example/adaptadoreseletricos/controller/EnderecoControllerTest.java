@@ -329,7 +329,7 @@ class EnderecoControllerTest {
 
     @DisplayName("Teste de remoção de endereço não associado ao usuário retorna status 404")
     @Test
-    public void test_remocao_de_endereco_associado_ao_usuario_retorna_status_404() throws Exception {
+    public void test_remocao_de_endereco_associado_a_outro_usuario_retorna_status_404() throws Exception {
         // Arrange
         enderecoRepository.save(enderecoPadrao);
         enderecosPessoasRepository.save(

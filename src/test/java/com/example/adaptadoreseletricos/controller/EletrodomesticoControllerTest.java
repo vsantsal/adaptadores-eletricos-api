@@ -1,6 +1,7 @@
 package com.example.adaptadoreseletricos.controller;
 
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.Eletrodomestico;
+import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.EletrodomesticosPessoas;
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.EletrodomesticosPessoasChave;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
@@ -25,10 +26,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -248,4 +249,83 @@ class EletrodomesticoControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @DisplayName("Teste de detalhamento de eletrodoméstico para id existente mas não associado na API")
+    @Test
+    public void test_nao_deve_detalhar_eletrodomestico_para_id_existente_nao_associado() throws Exception {
+        // Arrange
+        eletrodomesticoRepository.save(
+                new Eletrodomestico(
+                        2L,
+                        "DVD Player",
+                        "XYZ",
+                        "DEF",
+                        100L,
+                        enderecoPadrao
+                )
+        );
+
+        // Act
+        this.mockMvc.perform(get(ENDPOINT + "/2")
+                        .with(user(usuario)))
+
+                // Assert
+                .andExpect(status().isNotFound());
+    }
+
+    @DisplayName("Teste de remoção de eletrodoméstico associado ao usuário retorna status 204")
+    @Test
+    public void test_remocao_de_eletrodomestico_associado_ao_usuario_retorna_status_204() throws Exception {
+        // Arrange
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(),
+                        eletrodomesticoPadrao));
+
+        // Act
+        this.mockMvc.perform(
+                        delete(ENDPOINT + "/1")
+                                .with(user(usuario))
+                )
+
+                // Assert
+                .andExpect(status().isNoContent());
+    }
+
+    @DisplayName("Teste de remoção de eletrodoméstico associado ao usuário desativa a relação")
+    @Test
+    public void test_remocao_de_eletrodomestico_associado_ao_usuario_apaga_registros_pertinentes() throws Exception {
+        // Arrange
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(),
+                        eletrodomesticoPadrao));
+
+        // Act
+        this.mockMvc.perform(
+                delete(ENDPOINT + "/1")
+                        .with(user(usuario))
+        );
+
+        // Assert
+        var associacaoAtualizada = eletrodomesticosPessoasRepository
+                .findAll().stream().findFirst().get();
+        assertFalse(associacaoAtualizada.isAtivo());
+
+    }
+
+    @DisplayName("Teste de remoção de eletrodoméstico não associado ao usuário retorna status 404")
+    @Test
+    public void test_remocao_de_eletrodomestico_associado_ao_usuario_retorna_status_404() throws Exception {
+        // Arrange
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+
+        // Act
+        this.mockMvc.perform(
+                        delete(ENDPOINT + "/1")
+                                .with(user(usuario))
+                )
+
+                // Assert
+                .andExpect(status().isNotFound());
+    }
 }

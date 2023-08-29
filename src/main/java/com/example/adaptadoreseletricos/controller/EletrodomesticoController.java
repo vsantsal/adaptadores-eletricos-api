@@ -33,5 +33,11 @@ public class EletrodomesticoController {
         return ResponseEntity.ok(dto);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity excluir(@PathVariable Long id){
+        this.service.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

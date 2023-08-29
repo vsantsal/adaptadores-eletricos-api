@@ -48,4 +48,20 @@ public class EletrodomesticoService {
         Eletrodomestico eletrodomestico = this.eletrodomesticoRepository.getReferenceById(id);
         return new EletrodomesticoDetalheDTO(eletrodomestico);
     }
+
+    @Transactional
+    public void excluir(Long id) {
+        // Entidades envolvidas na tentativa de exclusão
+        var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
+        var eletroAExcluir = eletrodomesticoRepository.getReferenceById(id);
+        var chaveAssociacao = new EletrodomesticosPessoasChave(
+          pessoaLogada, eletroAExcluir
+        );
+
+        // Execução de procedimentos dependendo se endereço está associado ou não
+        var associacao = eletrodomesticosPessoasRepository.getReferenceById(chaveAssociacao);
+        associacao.desativar();
+        eletrodomesticosPessoasRepository.save(associacao);
+
+    }
 }
