@@ -2,8 +2,11 @@ package com.example.adaptadoreseletricos.service.eletrodomestico;
 
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.EletrodomesticosPessoas;
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.EletrodomesticosPessoasChave;
+import com.example.adaptadoreseletricos.domain.entity.endereco.EnderecosPessoasChave;
 import com.example.adaptadoreseletricos.domain.repository.eletrodomestico.EletrodomesticosPessoasRepository;
 import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecoRepository;
+import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecosPessoasRepository;
+import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.dto.eletrodomestico.EletrodomesticoCadastroDTO;
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.Eletrodomestico;
 import com.example.adaptadoreseletricos.domain.repository.eletrodomestico.EletrodomesticoRepository;
@@ -27,6 +30,8 @@ public class EletrodomesticoService {
     @Autowired
     private EletrodomesticosPessoasRepository eletrodomesticosPessoasRepository;
 
+    @Autowired
+    private EnderecosPessoasRepository enderecosPessoasRepository;
 
     @Transactional
     public EletrodomesticoDetalheDTO salvar(EletrodomesticoCadastroDTO dto) {
@@ -72,11 +77,18 @@ public class EletrodomesticoService {
         Eletrodomestico eletroAAtualizar = eletrodomesticoRepository.getReferenceById(id);
         var enderecoAAtualizar = enderecoRepository.getReferenceById(dto.idEndereco());
 
-        // Se não há associação, não permitir atualização
+        // Se não há associação eletrodoméstico com pessoa, não permitir atualização
         if (!eletrodomesticosPessoasRepository.existsByIdAtivoTrue(
                 new EletrodomesticosPessoasChave(pessoaLogada, eletroAAtualizar)
         )){
             throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
+        }
+
+        // Se não há associação endereço com pessoa, não permitir atualização
+        if (!enderecosPessoasRepository.existsByIdAtivoTrue(
+                new EnderecosPessoasChave(pessoaLogada, enderecoAAtualizar)
+        )){
+            throw new EntityNotFoundException("Endereço não associado ao usuário");
         }
 
         // Atualiza dados

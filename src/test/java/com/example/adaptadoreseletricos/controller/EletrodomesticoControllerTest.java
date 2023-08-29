@@ -4,6 +4,7 @@ import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.Eletrodome
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.EletrodomesticosPessoas;
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.EletrodomesticosPessoasChave;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
+import com.example.adaptadoreseletricos.domain.entity.endereco.EnderecosPessoas;
 import com.example.adaptadoreseletricos.domain.entity.endereco.Estado;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Pessoa;
 import com.example.adaptadoreseletricos.domain.entity.pessoa.Sexo;
@@ -11,6 +12,7 @@ import com.example.adaptadoreseletricos.domain.entity.pessoa.Usuario;
 import com.example.adaptadoreseletricos.domain.repository.eletrodomestico.EletrodomesticoRepository;
 import com.example.adaptadoreseletricos.domain.repository.eletrodomestico.EletrodomesticosPessoasRepository;
 import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecoRepository;
+import com.example.adaptadoreseletricos.domain.repository.endereco.EnderecosPessoasRepository;
 import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.service.eletrodomestico.EletrodomesticoService;
 import org.hamcrest.Matchers;
@@ -58,6 +60,9 @@ class EletrodomesticoControllerTest {
     private EnderecoRepository enderecoRepository;
 
     @Autowired
+    private EnderecosPessoasRepository enderecosPessoasRepository;
+
+    @Autowired
     private PessoaRepository pessoaRepository;
 
     private final Usuario usuario = new Usuario(
@@ -95,9 +100,10 @@ class EletrodomesticoControllerTest {
     @AfterEach
     public void tearDown(){
         eletrodomesticosPessoasRepository.deleteAll();
+        enderecosPessoasRepository.deleteAll();
         eletrodomesticoRepository.deleteAll();
         enderecoRepository.deleteAll();
-
+        pessoaRepository.deleteAll();
     }
 
     @DisplayName("Teste de cadastro de eletrodomestico válido na API")
@@ -333,10 +339,14 @@ class EletrodomesticoControllerTest {
     @Test
     public void test_atualizacao_valida_para_eletrodomestico_associado()  throws Exception {
         // Arrange
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
         eletrodomesticoRepository.save(eletrodomesticoPadrao);
         eletrodomesticosPessoasRepository.save(
                 new EletrodomesticosPessoas(usuario.getPessoa(), eletrodomesticoPadrao)
         );
+
 
         // Act
         this.mockMvc.perform(
@@ -410,6 +420,41 @@ class EletrodomesticoControllerTest {
                                                 "\"modelo\": \"XYZ\", " +
                                                 "\"marca\": \"DEF\", " +
                                                 "\"idEndereco\": 1, " +
+                                                "\"potencia\": 110}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isNotFound());
+    }
+
+    @DisplayName("Não pode atualizar informações para eletrodoméstico com endereço não associado ao usuário")
+    @Test
+    public void test_nao_pode_atualizar_eletrodomestico_com_endereco_nao_associado_ao_usuario() throws Exception {
+        // Arrange
+        Endereco outroEndereco = new Endereco(
+                2L,
+                "Avenida Lins de Vasconcelos",
+                1264L,
+                "Cambuci",
+                "São Paulo",
+                Estado.SP
+        );
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        enderecoRepository.save(outroEndereco);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), eletrodomesticoPadrao)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        put( ENDPOINT + "/1")
+                                .with(user(usuario))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"DVD Player\", " +
+                                                "\"modelo\": \"XYZ\", " +
+                                                "\"marca\": \"DEF\", " +
+                                                "\"idEndereco\": 2, " +
                                                 "\"potencia\": 110}"
                                 )
                 )

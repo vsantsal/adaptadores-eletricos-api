@@ -11,8 +11,13 @@ public record EletrodomesticoDetalheDTO(
         Long idEndereco
 ) {
     public EletrodomesticoDetalheDTO(Eletrodomestico eletrodomestico){
+
         this(eletrodomestico.getId(), eletrodomestico.getNome(),
-                eletrodomestico.getModelo(), eletrodomestico.getMarca(),
-                eletrodomestico.getPotencia(), eletrodomestico.getEndereco().getId());
+                eletrodomestico.getModelo(),
+                eletrodomestico.getMarca(),
+                eletrodomestico.getPotencia(),
+                eletrodomestico.getEndereco() != null ?
+                        eletrodomestico.getEndereco().getId() :
+                        null);
     }
 }
