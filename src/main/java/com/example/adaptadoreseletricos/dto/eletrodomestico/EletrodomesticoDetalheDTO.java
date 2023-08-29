@@ -7,11 +7,12 @@ public record EletrodomesticoDetalheDTO(
         String nome,
         String modelo,
         String marca,
-        Long potencia
+        Long potencia,
+        Long idEndereco
 ) {
     public EletrodomesticoDetalheDTO(Eletrodomestico eletrodomestico){
         this(eletrodomestico.getId(), eletrodomestico.getNome(),
                 eletrodomestico.getModelo(), eletrodomestico.getMarca(),
-                eletrodomestico.getPotencia());
+                eletrodomestico.getPotencia(), eletrodomestico.getEndereco().getId());
     }
 }

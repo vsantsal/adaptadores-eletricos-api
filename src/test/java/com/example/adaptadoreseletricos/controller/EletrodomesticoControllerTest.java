@@ -328,4 +328,44 @@ class EletrodomesticoControllerTest {
                 // Assert
                 .andExpect(status().isNotFound());
     }
+
+    @DisplayName("Deve atualizar informações para eletrodoméstico associado ao usuário")
+    @Test
+    public void test_atualizacao_valida_para_eletrodomestico_associado()  throws Exception {
+        // Arrange
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), eletrodomesticoPadrao)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        put( ENDPOINT + "/1")
+                                .with(user(usuario))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"DVD Player\", " +
+                                                "\"modelo\": \"XYZ\", " +
+                                                "\"marca\": \"DEF\", " +
+                                                "\"idEndereco\": 1, " +
+                                                "\"potencia\": 110}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$.nome",
+                        Matchers.is("DVD Player")))
+                .andExpect(jsonPath("$.modelo",
+                        Matchers.is("XYZ")))
+                .andExpect(jsonPath("$.marca",
+                        Matchers.is("DEF")))
+                .andExpect(jsonPath("$.idEndereco",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$.potencia",
+                        Matchers.is(110)))
+        ;
+    }
+
 }

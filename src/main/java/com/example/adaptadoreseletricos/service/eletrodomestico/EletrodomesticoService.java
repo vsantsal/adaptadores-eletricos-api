@@ -64,4 +64,24 @@ public class EletrodomesticoService {
         eletrodomesticosPessoasRepository.save(associacao);
 
     }
+
+    @Transactional
+    public EletrodomesticoDetalheDTO atualizar(Long id, EletrodomesticoCadastroDTO dto) {
+        // Entidades envolvidas na transação
+        var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
+        Eletrodomestico eletroAAtualizar = eletrodomesticoRepository.getReferenceById(id);
+        var enderecoAAtualizar = enderecoRepository.getReferenceById(dto.idEndereco());
+
+        // Atualiza dados
+        eletroAAtualizar.setNome(dto.nome());
+        eletroAAtualizar.setMarca(dto.marca());
+        eletroAAtualizar.setModelo(dto.modelo());
+        eletroAAtualizar.setPotencia(dto.potencia());
+        eletroAAtualizar.setEndereco(enderecoAAtualizar);
+
+        eletrodomesticoRepository.save(eletroAAtualizar);
+
+        return new EletrodomesticoDetalheDTO(eletroAAtualizar);
+
+    }
 }

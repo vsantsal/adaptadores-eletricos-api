@@ -39,5 +39,14 @@ public class EletrodomesticoController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid EletrodomesticoCadastroDTO dto
+    ){
+        var dtoResposta = this.service.atualizar(id, dto);
+        return ResponseEntity.ok(dtoResposta);
+    }
+
 
 }
