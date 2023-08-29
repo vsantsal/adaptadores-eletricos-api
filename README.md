@@ -45,9 +45,13 @@ Implementaremos as APIs de cadastro das entidades do domínio do problema, com o
 
 Há testes de integração para os controllers de modo a confirmar os principais comportamentos.
 
-Configuraos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*), além de permitir seu *bot* a atualizar a *badge* de cobertura de código pelos testes.
+Configuramos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*), além de permitir seu *bot* a atualizar a *badge* de cobertura de código pelos testes.
 
 # 📖 APIs
+
+Abaixo, descrevemos globalmente as APIs implementadas.
+
+Observar que o projeto se vale do *Swagger* para gerar documentação automaticamente, nos formatos *HTML*, *JSON* e *YAML*, nos *endpoints* padrão (`swagger-ui.html` e `v3/api-docs`).
 
 ## APIS  de autenticação
 
@@ -291,7 +295,8 @@ Sem ID, todas as pessoas com parentesco serão apresentadas. Pode-se utilizar ai
 * Para criarmos o relacionamento de parentes entre pessoas, do tipo M:N, nos baseamos fortemente neste [tutorial do Baldeung](https://www.baeldung.com/jpa-many-to-many);
 * Para criarmos *custom queries* que atualizassem a base no repositório da entidade associativa ParentescoPessoas, consultamos este [tutorial do Baldeung](https://www.baeldung.com/spring-data-jpa-modifying-annotation);
 * Haja vista a criação de consultas personalizadas, fizemos também teste de repositório para validar nossa implementação;
-* Retiramos uso de *mocks* para *repositories* - para garantir corretos *set up* e *tear down* entre execuções, adicionamos a *annotation* `@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)` às classes de controllers e repositories; 
+* Retiramos uso de *mocks* para *repositories* - para garantir corretos *set up* e *tear down* entre execuções, adicionamos a *annotation* `@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)` às classes de controllers e repositories;
+* Incluímos documentação dinâmica por meio de *swagger*, adicionando a dependência [SpringDoc](https://springdoc.org/)
 
 ## ⚠️ Pontos de atenção
 
