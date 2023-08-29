@@ -72,6 +72,13 @@ public class EletrodomesticoService {
         Eletrodomestico eletroAAtualizar = eletrodomesticoRepository.getReferenceById(id);
         var enderecoAAtualizar = enderecoRepository.getReferenceById(dto.idEndereco());
 
+        // Se não há associação, não permitir atualização
+        if (!eletrodomesticosPessoasRepository.existsByIdAtivoTrue(
+                new EletrodomesticosPessoasChave(pessoaLogada, eletroAAtualizar)
+        )){
+            throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
+        }
+
         // Atualiza dados
         eletroAAtualizar.setNome(dto.nome());
         eletroAAtualizar.setMarca(dto.marca());
