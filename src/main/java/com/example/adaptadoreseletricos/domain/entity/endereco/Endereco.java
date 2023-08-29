@@ -2,7 +2,6 @@ package com.example.adaptadoreseletricos.domain.entity.endereco;
 
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.Eletrodomestico;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,8 +28,7 @@ public class Endereco {
     @Enumerated(EnumType.STRING)
     private Estado estado;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_endereco")
+    @OneToMany(mappedBy = "endereco")
     private Set<Eletrodomestico> eletrodomesticos;
 
     public Endereco(Long id, String rua, Long numero,
