@@ -14,6 +14,7 @@ APIs de Adaptadores elétricos
 * [🗓️ Resumo Desenvolvimento](#-resumo-desenvolvimento)
   * [Primeira fase](#primeira-fase)
   * [Segunda fase](#segunda-fase)
+  * [⚠️ Pontos de atenção](#-pontos-de-atenção)
 <!-- TOC -->
 
 # 👓 Introdução
@@ -35,7 +36,7 @@ O link no github é https://github.com/vsantsal/adaptadores-eletricos-api.
 
 Considerando os novos requisitos para a segunda fase, apresentamos a seguinte modelagem para as entidades da aplicação na segunda fase.
 
-![Diagrama de Entidade Relacionamento](https://github.com/vsantsal/adaptadores-eletricos-api/blob/main/docs/V1_DER_aparelhos_domesticos.png)
+![Diagrama de Entidade Relacionamento](https://github.com/vsantsal/adaptadores-eletricos-api/blob/main/docs/V5_DER_aparelhos_domesticos.png)
 
 # 🔬 Escopo
 
@@ -44,9 +45,13 @@ Implementaremos as APIs de cadastro das entidades do domínio do problema, com o
 
 Há testes de integração para os controllers de modo a confirmar os principais comportamentos.
 
-Configuraos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*), além de permitir seu *bot* a atualizar a *badge* de cobertura de código pelos testes.
+Configuramos *workflow* no Actions para executar os testes em integrações de código no ramo principal (*main*), além de permitir seu *bot* a atualizar a *badge* de cobertura de código pelos testes.
 
 # 📖 APIs
+
+Abaixo, descrevemos globalmente as APIs implementadas.
+
+Observar que o projeto se vale do *Swagger* para gerar documentação automaticamente, nos formatos *HTML*, *JSON* e *YAML*, nos *endpoints* padrão (`swagger-ui.html` e `v3/api-docs`).
 
 ## APIS  de autenticação
 
@@ -290,4 +295,10 @@ Sem ID, todas as pessoas com parentesco serão apresentadas. Pode-se utilizar ai
 * Para criarmos o relacionamento de parentes entre pessoas, do tipo M:N, nos baseamos fortemente neste [tutorial do Baldeung](https://www.baeldung.com/jpa-many-to-many);
 * Para criarmos *custom queries* que atualizassem a base no repositório da entidade associativa ParentescoPessoas, consultamos este [tutorial do Baldeung](https://www.baeldung.com/spring-data-jpa-modifying-annotation);
 * Haja vista a criação de consultas personalizadas, fizemos também teste de repositório para validar nossa implementação;
-* Retiramos uso de *mocks* para *repositories* - para garantir corretos *set up* e *tear down* entre execuções, adicionamos a *annotation* `@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)` às classes de controllers e repositories; 
+* Retiramos uso de *mocks* para *repositories* - para garantir corretos *set up* e *tear down* entre execuções, adicionamos a *annotation* `@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)` às classes de controllers e repositories;
+* Incluímos documentação dinâmica por meio de *swagger*, adicionando a dependência [SpringDoc](https://springdoc.org/)
+
+## ⚠️ Pontos de atenção
+
+* Pendente de avaliação ainda a escabilidade da solução atual, especialmente no tocante à implementação dos relacionamentos N:N e 1:N;
+* Pendente de adicionarmos no pipiline de CI/CD a publicação de imagem para rodar a aplicação
