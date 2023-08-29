@@ -75,9 +75,20 @@ public class PessoaService {
 
     @Transactional
     public void excluir(Long id) {
+        // Entidades envolvidas na transação
+        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
+        Pessoa pessoaAExcluir = pessoaRepository.getReferenceById(id);
+
+        if (!parentescoPessoasRepository.existsById(
+                new ParentescoPessoasChave(pessoaLogada, pessoaAExcluir)
+        )){
+            throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
+        }
+
         this.parentescoPessoasRepository
                 .removerTodosParentescosDePessoa(id);
         this.pessoaRepository.deleteById(id);
+
     }
 
     @Transactional

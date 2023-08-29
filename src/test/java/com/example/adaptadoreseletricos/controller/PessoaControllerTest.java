@@ -250,13 +250,41 @@ class PessoaControllerTest {
 
     }
 
-    @DisplayName("Exclusão de pessoa retorna status 204 mesmo se id não existir")
-    @WithMockUser(username = "tester")
+    @DisplayName("Exclusão de pessoa retorna status 404 se id não existir")
     @Test
     public void test_exclusao_de_pessoa_que_nao_estah_na_base() throws Exception {
         // Act
         this.mockMvc.perform(
                 delete(ENDPOINT + "/1000")
+                        .with(user(usuarioTesteFeminino))
+                )
+
+                // Assert
+                .andExpect(status().isNotFound());
+    }
+
+    @DisplayName("Exclusão de pessoa retorna status 204 com id existente associada ao usuário")
+    @Test
+    public void test_exclusao_de_pessoa_que_estah_na_base() throws Exception {
+        // Arrange
+        parentescoPessoasRepository.save(
+                new ParentescoPessoas(
+                        usuarioTesteFeminino.getPessoa(),
+                        terceiraPessoa,
+                        Parentesco.TIA
+                )
+        );
+        parentescoPessoasRepository.save(
+                new ParentescoPessoas(
+                        terceiraPessoa,
+                        usuarioTesteFeminino.getPessoa(),
+                        Parentesco.SOBRINHA
+                )
+        );
+        // Act
+        this.mockMvc.perform(
+                        delete(ENDPOINT + "/1")
+                                .with(user(usuarioTesteFeminino))
 
                 )
 
@@ -264,18 +292,18 @@ class PessoaControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @DisplayName("Exclusão de pessoa retorna status 204 com id existente")
-    @WithMockUser(username = "tester")
+    @DisplayName("Exclusão de pessoa retorna status 404 com id existente não associada ao usuário")
     @Test
-    public void test_exclusao_de_pessoa_que_estah_na_base() throws Exception {
+    public void test_exclusao_de_pessoa_que_estah_na_base_e_nao_tem_parentesco() throws Exception {
         // Act
         this.mockMvc.perform(
                         delete(ENDPOINT + "/1")
+                                .with(user(usuarioTesteFeminino))
 
                 )
 
                 // Assert
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNotFound());
     }
 
     @DisplayName("Deve atualizar com sucesso todas as informações para pessoa com relacionamento válido")
