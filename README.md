@@ -108,9 +108,45 @@ Para o POST, o *body* de cada requisição deve informar JSON no seguinte format
 }
 ```
 
-Em caso de sucesso, a aplicação deve informar a *location* do recurso criado.
+Em caso de sucesso, a aplicação deve informar a *location* do recurso criado. O endereço cadastrado automaticamente estará associado ao usuário logado.
 
 Se falha nos dados passados pelos clientes, deve informar o erro.
+
+Por exemplo, caso cliente passe número de rua negativo, o sistema devolverá:
+
+```json
+[
+    {
+        "campo": "numero",
+        "mensagem": "número de rua deve ser positivo"
+    }
+]
+```
+
+Para o DELETE, deve-se passar o id do endereço a remover no endpoint (por exemplo, `enderecos/73`). A aplicação promoverá a exclusão e retornar o STATUS CODE 204. Um usuário logado somente poderá excluir endereços em que residam.
+
+Para o UPDATE, deve-se passar  o id do endereco a atualizar no endpoint (por exemplo, `enderecos/73`) e os novos valores para os campos no corpo da requisição, conforme abaixo:
+
+```json 
+{
+  "rua": "Rua Nascimento Silva",
+  "numero": 207,
+  "bairro": "Ipanema",
+  "cidade": "Rio de Janeiro",
+  "estado": "RJ"
+}
+```
+
+A aplicação fará as atualizações dos campos e retornará o STATUS CODE 200, em caso de sucesso. 
+
+Um usuário logado somente poderá atualizar endereços em que residam.
+
+O GET no endpoint pode ser realizado complementando com ID ou não.
+
+Se ID for informado, retornará o endereço buscado.
+
+Sem ID, todos endereços associados ao usuário serão listado. Pode-se ainda pesquisar pelos campos `rua`, `numero`, `bairro`, `cidade` e `estado`.
+
 
 ## API de Cadastro de Eletrodomésticos
 
@@ -164,7 +200,7 @@ Por exemplo, caso cliente passe sexo e parentesco de pessoas incoerentes, a apli
 }
 ```
 
-Para o DELETE, deve-se passar o id da pessoa a remover no endpoint (por exemplo, `pessoas/42`). A aplicação promoverá a exclusão e retornar o STATUS CODE 204.
+Para o DELETE, deve-se passar o id da pessoa a remover no endpoint (por exemplo, `pessoas/42`). A aplicação promoverá a exclusão e retornar o STATUS CODE 204. Um usuário logado somente poderá excluir pessoa com a qual possua parentesco.
 
 Para o UPDATE, deve-se passar  o id da pessoa a atualizar no endpoint (por exemplo, `pessoas/42`) e os novos valores para os campos no corpo da requisição, conforme abaixo:
 
@@ -177,7 +213,7 @@ Para o UPDATE, deve-se passar  o id da pessoa a atualizar no endpoint (por exemp
 }
 ```
 
-A aplicação fará as atualizações dos campos e retornará o STATUS CODE 200, em caso de sucesso.
+A aplicação fará as atualizações dos campos e retornará o STATUS CODE 200, em caso de sucesso. Um usuário logado somente poderá atualizar pessoa com a qual possua parentesco.
 
 O GET no endpoint pode ser realizado complementando com ID ou não.
 
