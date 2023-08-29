@@ -538,6 +538,52 @@ class EnderecoControllerTest {
 
     }
 
+    @DisplayName("Listagem de endereços para repositório com mais endereços associados não apresenta endereço inativo")
+    @Test
+    public void test_listagem_de_enderecos_para_repositorio_com_mais_enderecos_associados_ao_usuario_logado_nao_apresenta_inativo() throws Exception {
+        // Arrange
+        Endereco novoEndereco = new Endereco(
+                2L,
+                "Avenida Lins de Vasconcelos",
+                1264L,
+                "Cambuci",
+                "São Paulo",
+                Estado.SP
+        );
+        enderecoRepository.save(enderecoPadrao);
+        enderecoRepository.save(novoEndereco);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+        EnderecosPessoas enderecosPessoasInativo = new EnderecosPessoas(
+                usuario.getPessoa(), novoEndereco);
+        enderecosPessoasInativo.desativar();
+        enderecosPessoasRepository.save(enderecosPessoasInativo);
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(enderecoPadrao.getId().intValue())))
+                .andExpect(jsonPath("$[0].rua",
+                        Matchers.is(enderecoPadrao.getRua())))
+                .andExpect(jsonPath("$[0].numero",
+                        Matchers.is(enderecoPadrao.getNumero().intValue())))
+                .andExpect(jsonPath("$[0].bairro",
+                        Matchers.is(enderecoPadrao.getBairro())))
+                .andExpect(jsonPath("$[0].cidade",
+                        Matchers.is(enderecoPadrao.getCidade())))
+                .andExpect(jsonPath("$[0].estado",
+                        Matchers.is(enderecoPadrao.getEstado().name())))
+        ;
+
+
+    }
+
     @DisplayName("Listagem de endereços com filtro de estado")
     @Test
     public void test_listagem_de_enderecos_com_filtro_de_estado() throws Exception {

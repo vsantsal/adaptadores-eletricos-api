@@ -115,7 +115,7 @@ public class EnderecoService {
         List<Endereco> enderecos = enderecoRepository.findAll(exemplo);
         return enderecos
                 .stream()
-                .filter(e -> enderecosPessoasRepository.existsById(
+                .filter(e -> enderecosPessoasRepository.existsByIdAtivoTrue(
                             new EnderecosPessoasChave(pessoaLogada, e)
                         )
                 )
