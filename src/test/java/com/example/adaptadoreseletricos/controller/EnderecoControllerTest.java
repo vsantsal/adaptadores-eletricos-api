@@ -420,4 +420,95 @@ class EnderecoControllerTest {
                         Matchers.hasSize(0)));
     }
 
+    @DisplayName("Listagem de endereços para repositório com unico endereço associado ao usuário logado")
+    @Test
+    public void test_listagem_de_enderecos_para_repositorio_com_endereco_associado_ao_usuario_logado() throws Exception {
+        // Arrange
+        enderecoRepository.save(enderecoPadrao);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(enderecoPadrao.getId().intValue())))
+                .andExpect(jsonPath("$[0].rua",
+                        Matchers.is(enderecoPadrao.getRua())))
+                .andExpect(jsonPath("$[0].numero",
+                        Matchers.is(enderecoPadrao.getNumero().intValue())))
+                .andExpect(jsonPath("$[0].bairro",
+                        Matchers.is(enderecoPadrao.getBairro())))
+                .andExpect(jsonPath("$[0].cidade",
+                        Matchers.is(enderecoPadrao.getCidade())))
+                .andExpect(jsonPath("$[0].estado",
+                        Matchers.is(enderecoPadrao.getEstado().name())))
+        ;
+
+
+    }
+
+    @DisplayName("Listagem de endereços para repositório com mais endereços associados ao usuário logado")
+    @Test
+    public void test_listagem_de_enderecos_para_repositorio_com_mais_enderecos_associados_ao_usuario_logado() throws Exception {
+        // Arrange
+        Endereco novoEndereco = new Endereco(
+                2L,
+                "Avenida Lins de Vasconcelos",
+                1264L,
+                "Cambuci",
+                "São Paulo",
+                Estado.SP
+        );
+        enderecoRepository.save(enderecoPadrao);
+        enderecoRepository.save(novoEndereco);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), novoEndereco)
+        );
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(enderecoPadrao.getId().intValue())))
+                .andExpect(jsonPath("$[0].rua",
+                        Matchers.is(enderecoPadrao.getRua())))
+                .andExpect(jsonPath("$[0].numero",
+                        Matchers.is(enderecoPadrao.getNumero().intValue())))
+                .andExpect(jsonPath("$[0].bairro",
+                        Matchers.is(enderecoPadrao.getBairro())))
+                .andExpect(jsonPath("$[0].cidade",
+                        Matchers.is(enderecoPadrao.getCidade())))
+                .andExpect(jsonPath("$[0].estado",
+                        Matchers.is(enderecoPadrao.getEstado().name())))
+                .andExpect(jsonPath("$[1].id",
+                        Matchers.is(novoEndereco.getId().intValue())))
+                .andExpect(jsonPath("$[1].rua",
+                        Matchers.is(novoEndereco.getRua())))
+                .andExpect(jsonPath("$[1].numero",
+                        Matchers.is(novoEndereco.getNumero().intValue())))
+                .andExpect(jsonPath("$[1].bairro",
+                        Matchers.is(novoEndereco.getBairro())))
+                .andExpect(jsonPath("$[1].cidade",
+                        Matchers.is(novoEndereco.getCidade())))
+                .andExpect(jsonPath("$[1].estado",
+                        Matchers.is(novoEndereco.getEstado().name())))
+        ;
+
+
+    }
+
 }
