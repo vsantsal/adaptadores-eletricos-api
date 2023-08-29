@@ -29,7 +29,8 @@ public class Endereco {
     @Enumerated(EnumType.STRING)
     private Estado estado;
 
-    @OneToMany(mappedBy = "endereco")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_endereco")
     private Set<Eletrodomestico> eletrodomesticos;
 
     public Endereco(Long id, String rua, Long numero,
