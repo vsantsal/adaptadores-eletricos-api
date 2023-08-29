@@ -26,7 +26,9 @@ public class TratadorDeErros {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity tratarErro404() {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("id inexistente");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+         new ErroSoComMensagemValidacao("recurso inexistente")
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

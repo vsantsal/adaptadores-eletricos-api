@@ -6,9 +6,7 @@ import com.example.adaptadoreseletricos.domain.repository.pessoa.ParentescoPesso
 import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepository;
 import com.example.adaptadoreseletricos.service.pessoa.PessoaService;
 import org.junit.jupiter.api.*;
-import org.springframework.data.domain.Example;
 import org.hamcrest.Matchers;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,9 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.List;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

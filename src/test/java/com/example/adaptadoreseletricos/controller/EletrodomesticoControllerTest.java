@@ -1,6 +1,7 @@
 package com.example.adaptadoreseletricos.controller;
 
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.Eletrodomestico;
+import com.example.adaptadoreseletricos.domain.entity.endereco.Endereco;
 import com.example.adaptadoreseletricos.domain.repository.eletrodomestico.EletrodomesticoRepository;
 import com.example.adaptadoreseletricos.service.eletrodomestico.EletrodomesticoService;
 import jakarta.persistence.EntityNotFoundException;
@@ -54,7 +55,8 @@ class EletrodomesticoControllerTest {
                         "Aparelho de som",
                         "XPTO",
                         "ABC",
-                        200L
+                        200L,
+                        new Endereco()
                 )
         );
 
@@ -127,7 +129,8 @@ class EletrodomesticoControllerTest {
                         "b".repeat(120),
                         "XPTO",
                         "ABC",
-                        200L
+                        200L,
+                        new Endereco()
                 )
         );
 
@@ -160,7 +163,8 @@ class EletrodomesticoControllerTest {
                         "Aparelho de som",
                         "XPTO",
                         "ABC",
-                        200L
+                        200L,
+                        new Endereco()
                 )
         );
         // Act

@@ -8,6 +8,7 @@ import com.example.adaptadoreseletricos.dto.pessoa.PessoaDetalheDTO;
 import com.example.adaptadoreseletricos.dto.usuario.RegistroDTO;
 import jakarta.persistence.EntityExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,11 @@ public class RegistroUsuarioService {
         usuarioRepository.save(usuario);
 
         return new PessoaDetalheDTO(pessoaSalva);
+    }
+
+    public static Pessoa getPessoaLogada(){
+        var usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return usuario.getPessoa();
     }
 
 }
