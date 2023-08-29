@@ -462,4 +462,426 @@ class EletrodomesticoControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @DisplayName("Listagem de eletrodomésticos para repositório vazio")
+    @Test
+    public void test_listagem_de_eletrodomesticos_para_repositorio_vazio() throws Exception {
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(0)));
+    }
+
+    @DisplayName("Listagem de eletrodomésticos para repositório sem eletro associado ao usuário logado")
+    @Test
+    public void test_listagem_de_eletrodomesticos_para_repositorio_sem_eletro_associado_ao_usuario_logado() throws Exception {
+        // Arrange
+        Pessoa outraPessoa = new Pessoa(
+                2L,
+                "Usuario Testado",
+                LocalDate.of(1961, 2, 28),
+                Sexo.MASCULINO
+        );
+        pessoaRepository.save(outraPessoa);
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(outraPessoa, eletrodomesticoPadrao)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(0)));
+    }
+
+    @DisplayName("Listagem de eletrodomésticos para repositório com unico eletro associado ao usuário logado")
+    @Test
+    public void test_listagem_de_eletros_para_repositorio_com_eletro_associado_ao_usuario_logado() throws Exception {
+        // Arrange
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), eletrodomesticoPadrao)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is("Aparelho de som")))
+                .andExpect(jsonPath("$[0].modelo",
+                        Matchers.is("XPTO")))
+                .andExpect(jsonPath("$[0].marca",
+                        Matchers.is("ABC")))
+                .andExpect(jsonPath("$[0].idEndereco",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].potencia",
+                        Matchers.is(200)))
+        ;
+    }
+
+    @DisplayName("Listagem de eletrodomesticos para repositório com mais eletros associados ao usuário logado")
+    @Test
+    public void test_listagem_de_eletros_para_repositorio_com_mais_eletros_associados_ao_usuario_logado() throws Exception {
+        // Arrange
+        Eletrodomestico outroEletro = new Eletrodomestico(
+                2L,
+                "DVD Player",
+                "XYZ",
+                "DEF",
+                110L,
+                enderecoPadrao
+        );
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticoRepository.save(outroEletro);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), eletrodomesticoPadrao)
+        );
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), outroEletro)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(2)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is("Aparelho de som")))
+                .andExpect(jsonPath("$[0].modelo",
+                        Matchers.is("XPTO")))
+                .andExpect(jsonPath("$[0].marca",
+                        Matchers.is("ABC")))
+                .andExpect(jsonPath("$[0].idEndereco",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].potencia",
+                        Matchers.is(200)))
+                .andExpect(jsonPath("$[1].id",
+                        Matchers.is(2)))
+                .andExpect(jsonPath("$[1].nome",
+                        Matchers.is("DVD Player")))
+                .andExpect(jsonPath("$[1].modelo",
+                        Matchers.is("XYZ")))
+                .andExpect(jsonPath("$[1].marca",
+                        Matchers.is("DEF")))
+                .andExpect(jsonPath("$[1].idEndereco",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[1].potencia",
+                        Matchers.is(110)))
+        ;
+    }
+
+    @DisplayName("Listagem de eletrodomesticos com mais eletros associados não apresenta endereço inativo")
+    @Test
+    public void test_listagem_de_eletros_com_mais_eletros_nao_apresenta_inativo() throws Exception {
+        // Arrange
+        Eletrodomestico outroEletro = new Eletrodomestico(
+                2L,
+                "DVD Player",
+                "XYZ",
+                "DEF",
+                110L,
+                enderecoPadrao
+        );
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticoRepository.save(outroEletro);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), eletrodomesticoPadrao)
+        );
+        var associacaoInativa = new EletrodomesticosPessoas(usuario.getPessoa(), outroEletro);
+        associacaoInativa.desativar();
+        eletrodomesticosPessoasRepository.save(
+                associacaoInativa
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is("Aparelho de som")))
+                .andExpect(jsonPath("$[0].modelo",
+                        Matchers.is("XPTO")))
+                .andExpect(jsonPath("$[0].marca",
+                        Matchers.is("ABC")))
+                .andExpect(jsonPath("$[0].idEndereco",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].potencia",
+                        Matchers.is(200)))
+        ;
+    }
+
+    @DisplayName("Listagem de eletrodomesticos com filtro de nome")
+    @Test
+    public void test_listagem_de_eletros_com_filtro_de_nome() throws Exception {
+        // Arrange
+        Eletrodomestico outroEletro = new Eletrodomestico(
+                2L,
+                "DVD Player",
+                "XYZ",
+                "DEF",
+                110L,
+                enderecoPadrao
+        );
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticoRepository.save(outroEletro);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), eletrodomesticoPadrao)
+        );
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), outroEletro)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                                .param("nome", eletrodomesticoPadrao.getNome())
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is("Aparelho de som")))
+                .andExpect(jsonPath("$[0].modelo",
+                        Matchers.is("XPTO")))
+                .andExpect(jsonPath("$[0].marca",
+                        Matchers.is("ABC")))
+                .andExpect(jsonPath("$[0].idEndereco",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].potencia",
+                        Matchers.is(200)))
+
+        ;
+    }
+
+    @DisplayName("Listagem de eletrodomesticos com filtro de modelo")
+    @Test
+    public void test_listagem_de_eletros_com_filtro_de_modelo() throws Exception {
+        // Arrange
+        Eletrodomestico outroEletro = new Eletrodomestico(
+                2L,
+                "DVD Player",
+                "XYZ",
+                "DEF",
+                110L,
+                enderecoPadrao
+        );
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticoRepository.save(outroEletro);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), eletrodomesticoPadrao)
+        );
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), outroEletro)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                                .param("modelo", "XYZ")
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(2)))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is("DVD Player")))
+                .andExpect(jsonPath("$[0].modelo",
+                        Matchers.is("XYZ")))
+                .andExpect(jsonPath("$[0].marca",
+                        Matchers.is("DEF")))
+                .andExpect(jsonPath("$[0].idEndereco",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].potencia",
+                        Matchers.is(110)))
+        ;
+    }
+
+    @DisplayName("Listagem de eletrodomesticos com filtro de marca")
+    @Test
+    public void test_listagem_de_eletros_com_filtro_de_marca() throws Exception {
+        // Arrange
+        Eletrodomestico outroEletro = new Eletrodomestico(
+                2L,
+                "DVD Player",
+                "XYZ",
+                "DEF",
+                110L,
+                enderecoPadrao
+        );
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticoRepository.save(outroEletro);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), eletrodomesticoPadrao)
+        );
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), outroEletro)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                                .param("marca", eletrodomesticoPadrao.getMarca())
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is("Aparelho de som")))
+                .andExpect(jsonPath("$[0].modelo",
+                        Matchers.is("XPTO")))
+                .andExpect(jsonPath("$[0].marca",
+                        Matchers.is("ABC")))
+                .andExpect(jsonPath("$[0].idEndereco",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].potencia",
+                        Matchers.is(200)))
+
+        ;
+    }
+
+    @DisplayName("Listagem de eletrodomesticos com filtro de endereco")
+    @Test
+    public void test_listagem_de_eletros_com_filtro_de_endereco() throws Exception {
+        // Arrange
+        Eletrodomestico outroEletro = new Eletrodomestico(
+                2L,
+                "DVD Player",
+                "XYZ",
+                "DEF",
+                110L,
+                enderecoPadrao
+        );
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticoRepository.save(outroEletro);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), eletrodomesticoPadrao)
+        );
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), outroEletro)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                                .param("idEndereco", "1")
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(2)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is("Aparelho de som")))
+                .andExpect(jsonPath("$[0].modelo",
+                        Matchers.is("XPTO")))
+                .andExpect(jsonPath("$[0].marca",
+                        Matchers.is("ABC")))
+                .andExpect(jsonPath("$[0].idEndereco",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].potencia",
+                        Matchers.is(200)))
+                .andExpect(jsonPath("$[1].id",
+                        Matchers.is(2)))
+                .andExpect(jsonPath("$[1].nome",
+                        Matchers.is("DVD Player")))
+                .andExpect(jsonPath("$[1].modelo",
+                        Matchers.is("XYZ")))
+                .andExpect(jsonPath("$[1].marca",
+                        Matchers.is("DEF")))
+                .andExpect(jsonPath("$[1].idEndereco",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[1].potencia",
+                        Matchers.is(110)))
+        ;
+    }
+
+    @DisplayName("Listagem de eletrodomesticos com filtro de potencia")
+    @Test
+    public void test_listagem_de_eletros_com_filtro_de_potencia() throws Exception {
+        // Arrange
+        Eletrodomestico outroEletro = new Eletrodomestico(
+                2L,
+                "DVD Player",
+                "XYZ",
+                "DEF",
+                110L,
+                enderecoPadrao
+        );
+        eletrodomesticoRepository.save(eletrodomesticoPadrao);
+        eletrodomesticoRepository.save(outroEletro);
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), eletrodomesticoPadrao)
+        );
+        eletrodomesticosPessoasRepository.save(
+                new EletrodomesticosPessoas(usuario.getPessoa(), outroEletro)
+        );
+
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                                .param("potencia",
+                                        eletrodomesticoPadrao.getPotencia().toString())
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].nome",
+                        Matchers.is("Aparelho de som")))
+                .andExpect(jsonPath("$[0].modelo",
+                        Matchers.is("XPTO")))
+                .andExpect(jsonPath("$[0].marca",
+                        Matchers.is("ABC")))
+                .andExpect(jsonPath("$[0].idEndereco",
+                        Matchers.is(1)))
+                .andExpect(jsonPath("$[0].potencia",
+                        Matchers.is(200)))
+
+        ;
+    }
+
 }

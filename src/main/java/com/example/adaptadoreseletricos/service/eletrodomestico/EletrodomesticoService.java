@@ -14,8 +14,11 @@ import com.example.adaptadoreseletricos.dto.eletrodomestico.EletrodomesticoDetal
 import com.example.adaptadoreseletricos.service.pessoa.RegistroUsuarioService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class EletrodomesticoService {
@@ -102,5 +105,20 @@ public class EletrodomesticoService {
 
         return new EletrodomesticoDetalheDTO(eletroAAtualizar);
 
+    }
+
+    public List<EletrodomesticoDetalheDTO> listar(EletrodomesticoCadastroDTO paramPesquisa) {
+        // entidades envolvidas na requisição
+        var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
+        Eletrodomestico eletrodomesticoPesquisado = paramPesquisa.toEletrodomestico();
+        Example<Eletrodomestico> exemplo = Example.of(eletrodomesticoPesquisado);
+        List<Eletrodomestico> eletros = eletrodomesticoRepository.findAll(exemplo);
+        return eletros
+                .stream()
+                .filter(eletrodomestico -> eletrodomesticosPessoasRepository.existsByIdAtivoTrue(
+                        new EletrodomesticosPessoasChave(pessoaLogada, eletrodomestico)
+                ))
+                .map(EletrodomesticoDetalheDTO::new)
+                .toList();
     }
 }
