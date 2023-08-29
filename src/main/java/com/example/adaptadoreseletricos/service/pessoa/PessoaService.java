@@ -93,14 +93,22 @@ public class PessoaService {
 
     @Transactional
     public PessoaComParentescoDTO atualizar(Long id, PessoaCadastroDTO dto) {
-        // Atualiza dados da pessoa
+        // Entidades envolvidas na transação
+        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         Pessoa pessoaAAtualizar = pessoaRepository.getReferenceById(id);
+
+        if (!parentescoPessoasRepository.existsById(
+                new ParentescoPessoasChave(pessoaLogada, pessoaAAtualizar)
+        )){
+            throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
+        }
+
+        // Atualiza dados da pessoa
         pessoaAAtualizar.setNome(dto.nome());
         pessoaAAtualizar.setSexo(Sexo.valueOf(dto.sexo()));
         pessoaAAtualizar.setDataNascimento(dto.dataNascimento());
 
         // Atualiza parentesco com usuário
-        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         Parentesco novoParentesco = Parentesco.valueOf(dto.parentesco());
         Parentesco novoInversoDeParentesco = novoParentesco.getInversaoDeParentesco(
                 pessoaLogada.getSexo()

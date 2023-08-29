@@ -309,6 +309,22 @@ class PessoaControllerTest {
     @DisplayName("Deve atualizar com sucesso todas as informações para pessoa com relacionamento válido")
     @Test
     public void test_atualizacao_valida() throws Exception {
+        // Arrange
+        parentescoPessoasRepository.save(
+          new ParentescoPessoas(
+                  usuarioTesteFeminino.getPessoa(),
+                  terceiraPessoa,
+                  Parentesco.IRMA
+          )
+        );
+        parentescoPessoasRepository.save(
+                new ParentescoPessoas(
+                        terceiraPessoa,
+                        usuarioTesteFeminino.getPessoa(),
+                        Parentesco.IRMA
+                )
+        );
+
         // Act
         this.mockMvc.perform(
                         put( ENDPOINT + "/1")
@@ -333,6 +349,25 @@ class PessoaControllerTest {
                         Matchers.is("FILHA")))
                 .andExpect(jsonPath("$.sexo",
                         Matchers.is("FEMININO")))
+        ;
+    }
+
+    @DisplayName("Não pode atualizar dados para id existente mas não parente")
+    @Test
+    public void test_atualizacao_invalida_de_nao_parente() throws Exception {
+        // Act
+        this.mockMvc.perform(
+                        put( ENDPOINT + "/1")
+                                .with(user(usuarioTesteMasculino))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"Fulana\", " +
+                                                "\"dataNascimento\": \"2001-01-02\", " +
+                                                "\"parentesco\": \"FILHA\", " +
+                                                "\"sexo\": \"FEMININO\"}"
+                                ))
+                // Assert
+                .andExpect(status().isNotFound())
         ;
     }
 
