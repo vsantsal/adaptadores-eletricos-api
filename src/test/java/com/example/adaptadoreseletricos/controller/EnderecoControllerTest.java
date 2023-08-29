@@ -511,4 +511,193 @@ class EnderecoControllerTest {
 
     }
 
+    @DisplayName("Listagem de endereços com filtro de estado")
+    @Test
+    public void test_listagem_de_enderecos_com_filtro_de_estado() throws Exception {
+        // Arrange
+        Endereco novoEndereco = new Endereco(
+                2L,
+                "Avenida Lins de Vasconcelos",
+                1264L,
+                "Cambuci",
+                "São Paulo",
+                Estado.SP
+        );
+        enderecoRepository.save(enderecoPadrao);
+        enderecoRepository.save(novoEndereco);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), novoEndereco)
+        );
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT)
+                                .param("estado", "SP")
+                                .with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(novoEndereco.getId().intValue())))
+                .andExpect(jsonPath("$[0].rua",
+                        Matchers.is(novoEndereco.getRua())))
+                .andExpect(jsonPath("$[0].numero",
+                        Matchers.is(novoEndereco.getNumero().intValue())))
+                .andExpect(jsonPath("$[0].bairro",
+                        Matchers.is(novoEndereco.getBairro())))
+                .andExpect(jsonPath("$[0].cidade",
+                        Matchers.is(novoEndereco.getCidade())))
+                .andExpect(jsonPath("$[0].estado",
+                        Matchers.is(novoEndereco.getEstado().name())))
+        ;
+
+
+    }
+
+    @DisplayName("Listagem de endereços com filtro de cidade")
+    @Test
+    public void test_listagem_de_enderecos_com_filtro_de_cidade() throws Exception {
+        // Arrange
+        Endereco novoEndereco = new Endereco(
+                2L,
+                "Avenida Lins de Vasconcelos",
+                1264L,
+                "Cambuci",
+                "São Paulo",
+                Estado.SP
+        );
+        enderecoRepository.save(enderecoPadrao);
+        enderecoRepository.save(novoEndereco);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), novoEndereco)
+        );
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT)
+                                .param("cidade", "Rio de Janeiro")
+                                .with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(enderecoPadrao.getId().intValue())))
+                .andExpect(jsonPath("$[0].rua",
+                        Matchers.is(enderecoPadrao.getRua())))
+                .andExpect(jsonPath("$[0].numero",
+                        Matchers.is(enderecoPadrao.getNumero().intValue())))
+                .andExpect(jsonPath("$[0].bairro",
+                        Matchers.is(enderecoPadrao.getBairro())))
+                .andExpect(jsonPath("$[0].cidade",
+                        Matchers.is(enderecoPadrao.getCidade())))
+                .andExpect(jsonPath("$[0].estado",
+                        Matchers.is(enderecoPadrao.getEstado().name())))
+        ;
+
+
+    }
+
+    @DisplayName("Listagem de endereços com filtro de bairro")
+    @Test
+    public void test_listagem_de_enderecos_com_filtro_de_bairro() throws Exception {
+        // Arrange
+        Endereco novoEndereco = new Endereco(
+                2L,
+                "Avenida Lins de Vasconcelos",
+                1264L,
+                "Cambuci",
+                "São Paulo",
+                Estado.SP
+        );
+        enderecoRepository.save(enderecoPadrao);
+        enderecoRepository.save(novoEndereco);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), novoEndereco)
+        );
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT)
+                                .param("bairro", "Cambuci")
+                                .with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(novoEndereco.getId().intValue())))
+                .andExpect(jsonPath("$[0].rua",
+                        Matchers.is(novoEndereco.getRua())))
+                .andExpect(jsonPath("$[0].numero",
+                        Matchers.is(novoEndereco.getNumero().intValue())))
+                .andExpect(jsonPath("$[0].bairro",
+                        Matchers.is(novoEndereco.getBairro())))
+                .andExpect(jsonPath("$[0].cidade",
+                        Matchers.is(novoEndereco.getCidade())))
+                .andExpect(jsonPath("$[0].estado",
+                        Matchers.is(novoEndereco.getEstado().name())))
+        ;
+
+
+    }
+
+    @DisplayName("Listagem de endereços com filtro combinado de rua e número")
+    @Test
+    public void test_listagem_de_enderecos_com_filtro_de_rua_e_numero() throws Exception {
+        // Arrange
+        Endereco novoEndereco = new Endereco(
+                2L,
+                "Avenida Lins de Vasconcelos",
+                1264L,
+                "Cambuci",
+                "São Paulo",
+                Estado.SP
+        );
+        enderecoRepository.save(enderecoPadrao);
+        enderecoRepository.save(novoEndereco);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), novoEndereco)
+        );
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT)
+                                .param("rua", "Rua Nascimento Silva")
+                                .param("numero", "107")
+                                .with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(enderecoPadrao.getId().intValue())))
+                .andExpect(jsonPath("$[0].rua",
+                        Matchers.is(enderecoPadrao.getRua())))
+                .andExpect(jsonPath("$[0].numero",
+                        Matchers.is(enderecoPadrao.getNumero().intValue())))
+                .andExpect(jsonPath("$[0].bairro",
+                        Matchers.is(enderecoPadrao.getBairro())))
+                .andExpect(jsonPath("$[0].cidade",
+                        Matchers.is(enderecoPadrao.getCidade())))
+                .andExpect(jsonPath("$[0].estado",
+                        Matchers.is(enderecoPadrao.getEstado().name())))
+        ;
+
+
+    }
+
 }
