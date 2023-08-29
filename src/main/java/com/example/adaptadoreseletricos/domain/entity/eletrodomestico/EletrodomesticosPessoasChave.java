@@ -24,4 +24,9 @@ public class EletrodomesticosPessoasChave implements Serializable {
         this.eletrodomestico = eletrodomestico;
     }
 
+    @Deprecated
+    public EletrodomesticosPessoasChave(){
+
+    }
+
 }

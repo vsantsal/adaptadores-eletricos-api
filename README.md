@@ -161,13 +161,60 @@ Para o cadastro, o *body* de cada requisição deve informar JSON no seguinte fo
   "nome": "Aparelho de som",
   "modelo": "XPTO",
   "marca": "ABC",
-  "potencia": 200
+  "potencia": 220,
+  "idEndereco": 1
 }
 ```
 
 Em caso de sucesso, a aplicação deve informar a *location* do recurso criado.
 
+Importante observar que o eletrodoméstico cadastrado é automaticamente associado ao usuário logado.
+
 Se falha nos dados passados pelos clientes, deve informar o erro.
+
+Por exemplo, se houver tentativa de cadastro de aparelho com potência negativa, conforme corpo da requisição abaixo:
+
+```json
+{
+  "nome": "Aparelho de som",
+  "modelo": "XPTO",
+  "marca": "ABC",
+  "potencia": -220,
+  "idEndereco": 1
+}
+```
+A aplicação retornará a mensagem de erro abaixo (respota com status HTTP 400):
+
+```json
+[
+    {
+        "campo": "potencia",
+        "mensagem": "potencia deve ser número inteiro positivo"
+    }
+]
+```
+
+Para o DELETE, deve-se passar o id do eletrodoméstico a remover no endpoint (por exemplo, `eletrodomesticos/101`). A aplicação marcará a associação entre usuário e o eletrodoméstico como inativa e retornará o STATUS CODE 204. Um usuário logado somente poderá excluir eletrodomésticos que possua.
+
+Para o UPDATE, deve-se passar  o id do eletrodoméstico a atualizar no endpoint (por exemplo, `eletrodomesticos/101`) e os novos valores para os campos no corpo da requisição, conforme abaixo:
+
+```json 
+{
+  "nome": "Aparelho de som",
+  "modelo": "XPTO",
+  "marca": "ABC",
+  "potencia": 110,
+  "idEndereco": 1
+}
+```
+
+A aplicação fará as atualizações dos campos e retornará o STATUS CODE 200, em caso de sucesso.
+
+O GET no endpoint pode ser realizado complementando com ID ou não.
+
+Se ID for informado, retornará o eletrodoméstico buscado.
+
+Sem ID, todos eletrodomésticos associados ao usuário serão listado. Pode-se ainda pesquisar pelos campos `nome`, `marca`, `modelo`, `potencia` e `idEndereco`.
 
 ## API de Cadastro de Pessoas
 
