@@ -329,7 +329,7 @@ class EnderecoControllerTest {
 
     @DisplayName("Teste de remoção de endereço não associado ao usuário retorna status 404")
     @Test
-    public void test_remocao_de_endereco_associado_ao_usuario_retorna_status_404() throws Exception {
+    public void test_remocao_de_endereco_associado_a_outro_usuario_retorna_status_404() throws Exception {
         // Arrange
         enderecoRepository.save(enderecoPadrao);
         enderecosPessoasRepository.save(
@@ -347,7 +347,7 @@ class EnderecoControllerTest {
 
     }
 
-    @DisplayName("Deve atualizar com sucesso todas as informações para endereço associado ao usuário")
+    @DisplayName("Deve atualizar informações para endereço associado ao usuário")
     @Test
     public void test_atualizacao_valida() throws Exception {
         // Arrange
@@ -356,7 +356,6 @@ class EnderecoControllerTest {
                 new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
         );
 
-        // Act
         // Act
         this.mockMvc.perform(
                 put( ENDPOINT + "/1")
@@ -388,14 +387,41 @@ class EnderecoControllerTest {
 
     }
 
-    @DisplayName("Não pode atualizar com sucesso todas as informações para endereço associado ao usuário")
+    @DisplayName("Não pode atualizar informações para endereço não associado ao usuário")
     @Test
-    public void test_atualizacao_invalida() throws Exception {
+    public void test_atualizacao_invalida_endereco_nao_associado() throws Exception {
         // Arrange
         enderecoRepository.save(enderecoPadrao);
         enderecosPessoasRepository.save(
                 new EnderecosPessoas(outraPessoa, enderecoPadrao)
         );
+
+        // Act
+        this.mockMvc.perform(
+                        put( ENDPOINT + "/1")
+                                .with(user(usuario))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"rua\": \"Avenida Lins de Vasconcelos\", " +
+                                                "\"numero\": 1264, " +
+                                                "\"bairro\": \"Cambuci\", " +
+                                                "\"cidade\": \"São Paulo\", " +
+                                                "\"estado\": \"SP\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isNotFound());
+
+    }
+
+    @DisplayName("Não pode atualizar informações para endereço associado ao usuário mas inativo")
+    @Test
+    public void test_atualizacao_invalida_endereco_inativo() throws Exception {
+        // Arrange
+        var associacao = new EnderecosPessoas(outraPessoa, enderecoPadrao);
+        associacao.desativar();
+        enderecoRepository.save(enderecoPadrao);
+        enderecosPessoasRepository.save(associacao);
 
         // Act
         this.mockMvc.perform(
@@ -533,6 +559,52 @@ class EnderecoControllerTest {
                         Matchers.is(novoEndereco.getCidade())))
                 .andExpect(jsonPath("$[1].estado",
                         Matchers.is(novoEndereco.getEstado().name())))
+        ;
+
+
+    }
+
+    @DisplayName("Listagem de endereços para repositório com mais endereços associados não apresenta endereço inativo")
+    @Test
+    public void test_listagem_de_enderecos_para_repositorio_com_mais_enderecos_associados_ao_usuario_logado_nao_apresenta_inativo() throws Exception {
+        // Arrange
+        Endereco novoEndereco = new Endereco(
+                2L,
+                "Avenida Lins de Vasconcelos",
+                1264L,
+                "Cambuci",
+                "São Paulo",
+                Estado.SP
+        );
+        enderecoRepository.save(enderecoPadrao);
+        enderecoRepository.save(novoEndereco);
+        enderecosPessoasRepository.save(
+                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
+        );
+        EnderecosPessoas enderecosPessoasInativo = new EnderecosPessoas(
+                usuario.getPessoa(), novoEndereco);
+        enderecosPessoasInativo.desativar();
+        enderecosPessoasRepository.save(enderecosPessoasInativo);
+        // Act
+        this.mockMvc.perform(
+                        get(ENDPOINT).with(user(usuario))
+                )
+                // Assert
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].id",
+                        Matchers.is(enderecoPadrao.getId().intValue())))
+                .andExpect(jsonPath("$[0].rua",
+                        Matchers.is(enderecoPadrao.getRua())))
+                .andExpect(jsonPath("$[0].numero",
+                        Matchers.is(enderecoPadrao.getNumero().intValue())))
+                .andExpect(jsonPath("$[0].bairro",
+                        Matchers.is(enderecoPadrao.getBairro())))
+                .andExpect(jsonPath("$[0].cidade",
+                        Matchers.is(enderecoPadrao.getCidade())))
+                .andExpect(jsonPath("$[0].estado",
+                        Matchers.is(enderecoPadrao.getEstado().name())))
         ;
 
 

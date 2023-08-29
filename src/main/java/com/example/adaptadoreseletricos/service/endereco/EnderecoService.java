@@ -48,7 +48,7 @@ public class EnderecoService {
         var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         Endereco endereco = enderecoRepository.getReferenceById(id);
 
-        if (enderecosPessoasRepository.existsById(
+        if (enderecosPessoasRepository.existsByIdAtivoTrue(
                 new EnderecosPessoasChave(
                         pessoaLogada,
                         endereco
@@ -69,17 +69,11 @@ public class EnderecoService {
                 pessoaLogada,
                 enderecoAExcluir
         );
-        boolean enderecoDaPessoaLogada = enderecosPessoasRepository.existsById(chaveAssociacao);
 
-        // Execução de procedimentos dependendo se endereço está associado ou não
-        // Ao usuário logado na aplicação
-        if (enderecoDaPessoaLogada) {
-            var associacao = enderecosPessoasRepository.getReferenceById(chaveAssociacao);
-            associacao.desativar();
-            enderecosPessoasRepository.save(associacao);
-        } else {
-            throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
-        }
+        var associacao = enderecosPessoasRepository.getReferenceById(chaveAssociacao);
+        associacao.desativar();
+        enderecosPessoasRepository.save(associacao);
+
     }
 
     @Transactional
@@ -89,7 +83,7 @@ public class EnderecoService {
         var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
 
         // Se não há associação, não permitir atualização
-        if (!enderecosPessoasRepository.existsById(
+        if (!enderecosPessoasRepository.existsByIdAtivoTrue(
                 new EnderecosPessoasChave(pessoaLogada, enderecoAAtualizar)
         )){
             throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
@@ -115,7 +109,7 @@ public class EnderecoService {
         List<Endereco> enderecos = enderecoRepository.findAll(exemplo);
         return enderecos
                 .stream()
-                .filter(e -> enderecosPessoasRepository.existsById(
+                .filter(e -> enderecosPessoasRepository.existsByIdAtivoTrue(
                             new EnderecosPessoasChave(pessoaLogada, e)
                         )
                 )

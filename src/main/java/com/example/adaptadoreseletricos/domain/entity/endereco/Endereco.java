@@ -2,7 +2,6 @@ package com.example.adaptadoreseletricos.domain.entity.endereco;
 
 import com.example.adaptadoreseletricos.domain.entity.eletrodomestico.Eletrodomestico;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
