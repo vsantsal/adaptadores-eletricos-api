@@ -347,7 +347,7 @@ class EnderecoControllerTest {
 
     }
 
-    @DisplayName("Deve atualizar com sucesso todas as informações para endereço associado ao usuário")
+    @DisplayName("Deve atualizar informações para endereço associado ao usuário")
     @Test
     public void test_atualizacao_valida() throws Exception {
         // Arrange
@@ -388,14 +388,41 @@ class EnderecoControllerTest {
 
     }
 
-    @DisplayName("Não pode atualizar com sucesso todas as informações para endereço associado ao usuário")
+    @DisplayName("Não pode atualizar informações para endereço não associado ao usuário")
     @Test
-    public void test_atualizacao_invalida() throws Exception {
+    public void test_atualizacao_invalida_endereco_nao_associado() throws Exception {
         // Arrange
         enderecoRepository.save(enderecoPadrao);
         enderecosPessoasRepository.save(
                 new EnderecosPessoas(outraPessoa, enderecoPadrao)
         );
+
+        // Act
+        this.mockMvc.perform(
+                        put( ENDPOINT + "/1")
+                                .with(user(usuario))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"rua\": \"Avenida Lins de Vasconcelos\", " +
+                                                "\"numero\": 1264, " +
+                                                "\"bairro\": \"Cambuci\", " +
+                                                "\"cidade\": \"São Paulo\", " +
+                                                "\"estado\": \"SP\"}"
+                                )
+                )
+                // Assert
+                .andExpect(status().isNotFound());
+
+    }
+
+    @DisplayName("Não pode atualizar informações para endereço associado ao usuário mas inativo")
+    @Test
+    public void test_atualizacao_invalida_endereco_inativo() throws Exception {
+        // Arrange
+        var associacao = new EnderecosPessoas(outraPessoa, enderecoPadrao);
+        associacao.desativar();
+        enderecoRepository.save(enderecoPadrao);
+        enderecosPessoasRepository.save(associacao);
 
         // Act
         this.mockMvc.perform(

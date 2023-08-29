@@ -89,7 +89,7 @@ public class EnderecoService {
         var pessoaLogada = RegistroUsuarioService.getPessoaLogada();
 
         // Se não há associação, não permitir atualização
-        if (!enderecosPessoasRepository.existsById(
+        if (!enderecosPessoasRepository.existsByIdAtivoTrue(
                 new EnderecosPessoasChave(pessoaLogada, enderecoAAtualizar)
         )){
             throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
