@@ -6,6 +6,7 @@ import com.example.adaptadoreseletricos.domain.repository.pessoa.PessoaRepositor
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaCadastroDTO;
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaComParentescoDTO;
 import com.example.adaptadoreseletricos.dto.pessoa.PessoaDetalheDTO;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import java.util.List;
 
 @Service
 public class PessoaService {
+
+    private final String MENSAGEM_ERRO_NAO_ASSOCIACAO = "Pessoas não associadas";
 
     @Autowired
     private PessoaRepository pessoaRepository;
@@ -59,27 +62,53 @@ public class PessoaService {
     }
 
     public PessoaDetalheDTO detalhar(Long id) {
+        // Entidades envolvidas na requisição
+        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         Pessoa pessoa = pessoaRepository.getReferenceById(id);
-        return new PessoaDetalheDTO(pessoa);
+        if (parentescoPessoasRepository.existsById(
+                new ParentescoPessoasChave(pessoaLogada, pessoa)
+        )){
+            return new PessoaDetalheDTO(pessoa);
+        }
+        throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
     }
 
     @Transactional
     public void excluir(Long id) {
+        // Entidades envolvidas na transação
+        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
+        Pessoa pessoaAExcluir = pessoaRepository.getReferenceById(id);
+
+        if (!parentescoPessoasRepository.existsById(
+                new ParentescoPessoasChave(pessoaLogada, pessoaAExcluir)
+        )){
+            throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
+        }
+
         this.parentescoPessoasRepository
                 .removerTodosParentescosDePessoa(id);
         this.pessoaRepository.deleteById(id);
+
     }
 
     @Transactional
     public PessoaComParentescoDTO atualizar(Long id, PessoaCadastroDTO dto) {
-        // Atualiza dados da pessoa
+        // Entidades envolvidas na transação
+        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         Pessoa pessoaAAtualizar = pessoaRepository.getReferenceById(id);
+
+        if (!parentescoPessoasRepository.existsById(
+                new ParentescoPessoasChave(pessoaLogada, pessoaAAtualizar)
+        )){
+            throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
+        }
+
+        // Atualiza dados da pessoa
         pessoaAAtualizar.setNome(dto.nome());
         pessoaAAtualizar.setSexo(Sexo.valueOf(dto.sexo()));
         pessoaAAtualizar.setDataNascimento(dto.dataNascimento());
 
         // Atualiza parentesco com usuário
-        Pessoa pessoaLogada = RegistroUsuarioService.getPessoaLogada();
         Parentesco novoParentesco = Parentesco.valueOf(dto.parentesco());
         Parentesco novoInversoDeParentesco = novoParentesco.getInversaoDeParentesco(
                 pessoaLogada.getSexo()

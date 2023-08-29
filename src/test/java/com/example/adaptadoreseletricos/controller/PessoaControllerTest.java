@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("test")
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @AutoConfigureMockMvc
 class PessoaControllerTest {
 
@@ -122,11 +123,28 @@ class PessoaControllerTest {
     }
 
     @DisplayName("Teste de detalhamento de pessoa para id válido na API")
-    @WithMockUser(username = "tester")
     @Test
     public void test_deve_detalhar_pessoa_para_id_valido() throws Exception {
+        // Arrange
+        parentescoPessoasRepository.save(
+          new ParentescoPessoas(
+                  usuarioTesteMasculino.getPessoa(),
+                  terceiraPessoa,
+                  Parentesco.IRMA
+          )
+        );
+        parentescoPessoasRepository.save(
+                new ParentescoPessoas(
+                        terceiraPessoa,
+                        usuarioTesteMasculino.getPessoa(),
+                        Parentesco.IRMAO
+                )
+        );
         // Act
-        this.mockMvc.perform(get(ENDPOINT +"/1"))
+        this.mockMvc.perform(
+                get(ENDPOINT +"/1")
+                        .with(user(usuarioTesteMasculino))
+                )
                 // Assert
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id",
@@ -139,12 +157,28 @@ class PessoaControllerTest {
                         Matchers.is("FEMININO")));
     }
 
+    @DisplayName("Teste de detalhamento de pessoa para id válido sem parentesco na API")
+    @Test
+    public void test_nao_deve_detalhar_pessoa_para_id_valido_sem_parentesco() throws Exception {
+        // Act
+        this.mockMvc.perform(
+                get(ENDPOINT + "/2")
+                        .with(user(usuarioTesteMasculino))
+                )
+
+                // Assert
+                .andExpect(status().isNotFound());
+
+    }
+
     @DisplayName("Teste de detalhamento de pessoa para Id inexistente na API")
-    @WithMockUser(username = "tester")
     @Test
     public void test_nao_deve_detalhar_pessoa_para_id_invalido() throws Exception {
         // Act
-        this.mockMvc.perform(get(ENDPOINT + "/1000"))
+        this.mockMvc.perform(
+                get(ENDPOINT + "/1000")
+                        .with(user(usuarioTesteFeminino))
+                )
 
                 // Assert
                 .andExpect(status().isNotFound());
@@ -216,13 +250,41 @@ class PessoaControllerTest {
 
     }
 
-    @DisplayName("Exclusão de pessoa retorna status 204 mesmo se id não existir")
-    @WithMockUser(username = "tester")
+    @DisplayName("Exclusão de pessoa retorna status 404 se id não existir")
     @Test
     public void test_exclusao_de_pessoa_que_nao_estah_na_base() throws Exception {
         // Act
         this.mockMvc.perform(
                 delete(ENDPOINT + "/1000")
+                        .with(user(usuarioTesteFeminino))
+                )
+
+                // Assert
+                .andExpect(status().isNotFound());
+    }
+
+    @DisplayName("Exclusão de pessoa retorna status 204 com id existente associada ao usuário")
+    @Test
+    public void test_exclusao_de_pessoa_que_estah_na_base() throws Exception {
+        // Arrange
+        parentescoPessoasRepository.save(
+                new ParentescoPessoas(
+                        usuarioTesteFeminino.getPessoa(),
+                        terceiraPessoa,
+                        Parentesco.TIA
+                )
+        );
+        parentescoPessoasRepository.save(
+                new ParentescoPessoas(
+                        terceiraPessoa,
+                        usuarioTesteFeminino.getPessoa(),
+                        Parentesco.SOBRINHA
+                )
+        );
+        // Act
+        this.mockMvc.perform(
+                        delete(ENDPOINT + "/1")
+                                .with(user(usuarioTesteFeminino))
 
                 )
 
@@ -230,23 +292,39 @@ class PessoaControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @DisplayName("Exclusão de pessoa retorna status 204 com id existente")
-    @WithMockUser(username = "tester")
+    @DisplayName("Exclusão de pessoa retorna status 404 com id existente não associada ao usuário")
     @Test
-    public void test_exclusao_de_pessoa_que_estah_na_base() throws Exception {
+    public void test_exclusao_de_pessoa_que_estah_na_base_e_nao_tem_parentesco() throws Exception {
         // Act
         this.mockMvc.perform(
                         delete(ENDPOINT + "/1")
+                                .with(user(usuarioTesteFeminino))
 
                 )
 
                 // Assert
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNotFound());
     }
 
     @DisplayName("Deve atualizar com sucesso todas as informações para pessoa com relacionamento válido")
     @Test
     public void test_atualizacao_valida() throws Exception {
+        // Arrange
+        parentescoPessoasRepository.save(
+          new ParentescoPessoas(
+                  usuarioTesteFeminino.getPessoa(),
+                  terceiraPessoa,
+                  Parentesco.IRMA
+          )
+        );
+        parentescoPessoasRepository.save(
+                new ParentescoPessoas(
+                        terceiraPessoa,
+                        usuarioTesteFeminino.getPessoa(),
+                        Parentesco.IRMA
+                )
+        );
+
         // Act
         this.mockMvc.perform(
                         put( ENDPOINT + "/1")
@@ -271,6 +349,25 @@ class PessoaControllerTest {
                         Matchers.is("FILHA")))
                 .andExpect(jsonPath("$.sexo",
                         Matchers.is("FEMININO")))
+        ;
+    }
+
+    @DisplayName("Não pode atualizar dados para id existente mas não parente")
+    @Test
+    public void test_atualizacao_invalida_de_nao_parente() throws Exception {
+        // Act
+        this.mockMvc.perform(
+                        put( ENDPOINT + "/1")
+                                .with(user(usuarioTesteMasculino))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"nome\": \"Fulana\", " +
+                                                "\"dataNascimento\": \"2001-01-02\", " +
+                                                "\"parentesco\": \"FILHA\", " +
+                                                "\"sexo\": \"FEMININO\"}"
+                                ))
+                // Assert
+                .andExpect(status().isNotFound())
         ;
     }
 
