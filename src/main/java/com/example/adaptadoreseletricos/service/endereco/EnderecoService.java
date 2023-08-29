@@ -74,8 +74,9 @@ public class EnderecoService {
         // Execução de procedimentos dependendo se endereço está associado ou não
         // Ao usuário logado na aplicação
         if (enderecoDaPessoaLogada) {
-            this.enderecosPessoasRepository.deleteById(chaveAssociacao);
-            this.enderecoRepository.delete(enderecoAExcluir);
+            var associacao = enderecosPessoasRepository.getReferenceById(chaveAssociacao);
+            associacao.desativar();
+            enderecosPessoasRepository.save(associacao);
         } else {
             throw new EntityNotFoundException(MENSAGEM_ERRO_NAO_ASSOCIACAO);
         }

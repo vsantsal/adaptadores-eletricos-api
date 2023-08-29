@@ -123,7 +123,7 @@ Por exemplo, caso cliente passe número de rua negativo, o sistema devolverá:
 ]
 ```
 
-Para o DELETE, deve-se passar o id do endereço a remover no endpoint (por exemplo, `enderecos/73`). A aplicação promoverá a exclusão e retornar o STATUS CODE 204. Um usuário logado somente poderá excluir endereços em que residam.
+Para o DELETE, deve-se passar o id do endereço a remover no endpoint (por exemplo, `enderecos/73`). A aplicação marcará a associação entre usuário e o endereço como inativa e retornará o STATUS CODE 204. Um usuário logado somente poderá excluir endereços em que residam.
 
 Para o UPDATE, deve-se passar  o id do endereco a atualizar no endpoint (por exemplo, `enderecos/73`) e os novos valores para os campos no corpo da requisição, conforme abaixo:
 

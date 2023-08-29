@@ -307,14 +307,13 @@ class EnderecoControllerTest {
 
     }
 
-    @DisplayName("Teste de remoção de endereço associado ao usuário apaga registros pertinentes")
+    @DisplayName("Teste de remoção de endereço associado ao usuário desativa a relação")
     @Test
     public void test_remocao_de_endereco_associado_ao_usuario_apaga_registros_pertinentes() throws Exception {
         // Arrange
+        var associacao = new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao);
         enderecoRepository.save(enderecoPadrao);
-        enderecosPessoasRepository.save(
-                new EnderecosPessoas(usuario.getPessoa(), enderecoPadrao)
-        );
+        enderecosPessoasRepository.save(associacao);
 
         // Act
         this.mockMvc.perform(
@@ -323,8 +322,9 @@ class EnderecoControllerTest {
                 );
 
         // Assert
-        boolean estahNaBase = enderecoRepository.existsById(1L);
-        assertFalse(estahNaBase);
+        var associacaoAtualizada = enderecosPessoasRepository
+                .findAll().stream().findFirst().get();
+        assertFalse(associacaoAtualizada.isAtivo());
     }
 
     @DisplayName("Teste de remoção de endereço não associado ao usuário retorna status 404")
