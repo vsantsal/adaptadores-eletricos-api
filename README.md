@@ -320,4 +320,4 @@ Interrompe-se o contêiner por meio do comando:
 
 * Pendente de avaliação ainda a escabilidade da solução atual, especialmente no tocante à implementação dos relacionamentos N:N e 1:N;
 * Pendente de disponibilizarmos imagem com banco de dados MySQL para se rodar a aplicação;
-* Após a pendência anterior, adicionarmos no pipiline de CI/CD a construção e publicação da imagem.
+* Após a pendência anterior, adicionarmos no pipeline de CI/CD a construção e publicação da imagem.
