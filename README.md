@@ -24,6 +24,7 @@ APIs de Adaptadores elétricos
 
 ![framework_back](https://img.shields.io/badge/Spring_Boot-F2F4F9?style=for-the-badge&logo=spring-boot)
 ![server_ci](https://img.shields.io/badge/Github%20Actions-282a2e?style=for-the-badge&logo=githubactions&logoColor=367cfe)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
 ![example workflow](https://github.com/vsantsal/adaptadores-eletricos-api/actions/workflows/maven.yml/badge.svg)
 ![Coverage](.github/badges/jacoco.svg)
@@ -273,6 +274,21 @@ Se ID for informado, retornará a pessoa buscada.
 
 Sem ID, todas as pessoas com parentesco serão apresentadas. Pode-se utilizar ainda `nome`, `sexo`, `dataNascimento`e `parentesco` com parâmetros de pesquisa. 
 
+# 🐳 Contêineres
+
+Disponibilizamos imagem para que usuários possam rodar localmente a aplicação.
+
+Nessa primeira versão, apenas em modo de "testes", isto é, utilizando banco de dados em memória.
+
+Como entrega futura, ficamos de adicionar o *pull* de imagem de banco de dados de "produção" (MySQL), e sua comunicação com a aplicação.
+
+Para rodar, basta executar:
+
+`docker-compose up --build`
+
+Interrompe-se o contêiner por meio do comando:
+
+`docker-compose down`
 
 # 🗓️ Resumo Desenvolvimento
 
@@ -297,8 +313,10 @@ Sem ID, todas as pessoas com parentesco serão apresentadas. Pode-se utilizar ai
 * Haja vista a criação de consultas personalizadas, fizemos também teste de repositório para validar nossa implementação;
 * Retiramos uso de *mocks* para *repositories* - para garantir corretos *set up* e *tear down* entre execuções, adicionamos a *annotation* `@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)` às classes de controllers e repositories;
 * Incluímos documentação dinâmica por meio de *swagger*, adicionando a dependência [SpringDoc](https://springdoc.org/)
+* Incluímos `Dockerfile` e `docker-compose.yaml` para disponibilizar imagem de modo a se rodar a aplicação em modo de testes (com banco de dados em memória)
 
 ## ⚠️ Pontos de atenção
 
 * Pendente de avaliação ainda a escabilidade da solução atual, especialmente no tocante à implementação dos relacionamentos N:N e 1:N;
-* Pendente de adicionarmos no pipiline de CI/CD a publicação de imagem para rodar a aplicação
+* Pendente de disponibilizarmos imagem com banco de dados MySQL para se rodar a aplicação;
+* Após a pendência anterior, adicionarmos no pipiline de CI/CD a construção e publicação da imagem.
